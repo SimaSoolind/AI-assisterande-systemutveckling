@@ -12,10 +12,15 @@
           {
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/skydda-tester.mjs\""
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/stoppa-hemligheter.mjs\""
           }
         ]
       }
-    ],    "PostToolUse": [
+    ],
+    "PostToolUse": [
       {
         "matcher": "Edit|Write",
         "hooks": [
@@ -26,7 +31,6 @@
         ]
       }
     ],
-
     "SessionStart": [
       {
         "hooks": [
