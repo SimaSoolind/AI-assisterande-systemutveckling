@@ -11,7 +11,7 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [ ] Kodstandard som kontrolleras automatiskt: formatering
 - [ ] Kodstandard som kontrolleras automatiskt: typkontroll
 - [ ] Felmeddelandena säger hur felet rättas
-- [ ] Skill 1: `/tdd`
+- [X] Skill 1: `/tdd`
 - [ ] Skill 2:
 - [ ] Skill 3:
 - [ ] Subagent 1 (beskrivning, verktyg, modell)
