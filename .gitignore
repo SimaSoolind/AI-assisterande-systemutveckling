@@ -7,3 +7,6 @@ src/legacy/price_calc.log
 .claude/settings.local.json
 .venv/
 .DS_Store
+
+# Kursmaterial: läses av Claude, publiceras aldrig
+AI-utveckling/
