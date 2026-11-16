@@ -20,5 +20,7 @@ Riggen har behörigheter och skillen /tdd.
 - Kursmaterialet ligger i AI-utveckling/ och står i .gitignore.
 
 ## Förbrukning
-- Tokens:
-- Tid:
+- Tokens: 5 013 222 totalt, varav 15 479 output (bara ovningsprojekt, 16 nov)
+- /usage: sessionen 30 %, veckan 7 %
+- Tid: ca 1 tim 50 min
+
