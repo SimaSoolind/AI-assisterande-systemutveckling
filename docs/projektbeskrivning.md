@@ -14,13 +14,13 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [X] Skill 1: `/tdd`
 - [ ] Skill 2:
 - [ ] Skill 3:
-- [ ] Subagent 1 (beskrivning, verktyg, modell)
-- [ ] Subagent 2
-- [ ] Subagent 3
-- [ ] Subagent 4
+- [X] Subagent 1 (beskrivning, verktyg, modell)
+- [X] Subagent 2
+- [X] Subagent 3
+- [X] Subagent 4
 - [ ] Hook 1: minneskedjan sparar sessionens läge
 - [ ] Hook 2: minneskedjan laddar sessionens läge
-- [ ] Hook 3: stoppar att tester tas bort eller stängs av
+- [X] Hook 3: stoppar att tester tas bort eller stängs av
 - [ ] Hook 4:
 - [ ] Hook 5:
 - [ ] Sessionslogg efter varje arbetspass i `sessions/`
