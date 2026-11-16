@@ -16,5 +16,18 @@
       "Bash(rm -rf:*)",
       "Bash(git push --force:*)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/skydda-tester.mjs\""
+          }
+        ]
+      }
+    ]
   }
 }
