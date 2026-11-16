@@ -19,7 +19,7 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [X] Subagent 3
 - [X] Subagent 4
 - [ ] Hook 1: minneskedjan sparar sessionens läge
-- [ ] Hook 2: minneskedjan laddar sessionens läge
+- [X] Hook 2: minneskedjan laddar sessionens läge
 - [X] Hook 3: stoppar att tester tas bort eller stängs av
 - [ ] Hook 4:
 - [ ] Hook 5:

@@ -15,7 +15,18 @@
           }
         ]
       }
+    ],    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/format-och-kontroll.mjs\""
+          }
+        ]
+      }
     ],
+
     "SessionStart": [
       {
         "hooks": [
