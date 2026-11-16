@@ -6,7 +6,7 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 ## Min checklista (bocka av med x)
 
 ### Riggen
-- [ ] Behörigheter med `allow`, `ask` och `deny` i `.claude/settings.json`
+- [X] Behörigheter med `allow`, `ask` och `deny` i `.claude/settings.json`
 - [ ] Kodstandard som kontrolleras automatiskt: linter
 - [ ] Kodstandard som kontrolleras automatiskt: formatering
 - [ ] Kodstandard som kontrolleras automatiskt: typkontroll
