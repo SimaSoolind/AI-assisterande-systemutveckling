@@ -14,6 +14,9 @@ try {
   process.exit(0);
 }
 
+// Var texten null? Då finns inget att kontrollera. Släpp igenom
+if (anrop === null) process.exit(0);
+
 // Uppgifterna om ändringen. Saknas de? Släpp igenom
 const andring = anrop.tool_input;
 if (andring === undefined) process.exit(0);
@@ -22,8 +25,16 @@ if (andring === undefined) process.exit(0);
 let fil = "";
 if (andring.file_path !== undefined) fil = andring.file_path;
 
-// Vill Claude ändra en .env-fil? Stoppa. Där ligger hemligheterna
-if (fil.endsWith(".env")) {
+// Dela upp sökvägen vid varje /
+const delar = fil.split("/");
+// Sista delen är filens namn, till exempel .env.local
+const filnamn = delar[delar.length - 1];
+// Är det en .env-fil? Till exempel .env, .env.local eller .env.production
+const arEnvFil = filnamn === ".env" || filnamn.startsWith(".env.");
+// .env.example är en mall utan hemligheter. Den får ändras
+const arMall = filnamn === ".env.example";
+// En .env-fil som inte är mallen? Stoppa. Där ligger hemligheterna
+if (arEnvFil && !arMall) {
   process.stderr.write("Stoppad: .env får inte ändras av agenten. Sima ändrar .env själv.\n");
   process.exit(2);
 }

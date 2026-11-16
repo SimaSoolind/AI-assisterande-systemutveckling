@@ -22,7 +22,7 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [X] Hook 2: minneskedjan laddar sessionens läge
 - [X] Hook 3: stoppar att tester tas bort eller stängs av
 - [X] Hook 4:format-och-kontroll
-- [ ] Hook 5:
+- [X] Hook 5:stoppa-hemligheter
 - [ ] Sessionslogg efter varje arbetspass i `sessions/`
 
 ### Arbete 1: Ny funktion

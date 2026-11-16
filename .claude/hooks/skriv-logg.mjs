@@ -16,8 +16,14 @@ try {
   process.exit(0);
 }
 
+// Var texten null? Då finns inget att läsa. Avsluta tyst
+if (anrop === null) process.exit(0);
+
 // Sökvägen till transkriptet: filen med allt som sagts och gjorts i chatten
 const transkriptFil = anrop.transcript_path;
+
+// Finns inget transkript? Då finns inget att logga. Avsluta tyst
+if (!fs.existsSync(transkriptFil)) process.exit(0);
 
 // Läs hela transkriptet som text
 const transkriptText = fs.readFileSync(transkriptFil, "utf8");
@@ -93,6 +99,8 @@ if (fs.existsSync(loggFil)) process.exit(0);
 const loggRader = [];
 // Rubriken överst
 loggRader.push(`# Pass ${nummer} (utkast från hooken)`);
+// Påminnelse: sessions/ kommer med i git (SAL F6, känslig data)
+loggRader.push("> Läs utkastet innan du committar. Ta bort allt som är privat.");
 // Vad jag bad om
 loggRader.push("## Du bad om");
 for (const meddelande of minaMeddelanden) {

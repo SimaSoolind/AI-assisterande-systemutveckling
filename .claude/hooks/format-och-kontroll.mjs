@@ -16,6 +16,9 @@ try {
   process.exit(0);
 }
 
+// Var texten null? Då finns inget att kontrollera. Avsluta tyst
+if (anrop === null) process.exit(0);
+
 // Uppgifterna om ändringen. Saknas de? Avsluta tyst
 const andring = anrop.tool_input;
 if (andring === undefined) process.exit(0);
