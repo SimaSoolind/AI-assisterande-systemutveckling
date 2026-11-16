@@ -7,9 +7,9 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 
 ### Riggen
 - [X] Behörigheter med `allow`, `ask` och `deny` i `.claude/settings.json`
-- [ ] Kodstandard som kontrolleras automatiskt: linter
-- [ ] Kodstandard som kontrolleras automatiskt: formatering
-- [ ] Kodstandard som kontrolleras automatiskt: typkontroll
+- [X] Kodstandard som kontrolleras automatiskt: linter
+- [X] Kodstandard som kontrolleras automatiskt: formatering
+- [X] Kodstandard som kontrolleras automatiskt: typkontroll
 - [ ] Felmeddelandena säger hur felet rättas
 - [X] Skill 1: `/tdd`
 - [ ] Skill 2:
@@ -21,7 +21,7 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [ ] Hook 1: minneskedjan sparar sessionens läge
 - [X] Hook 2: minneskedjan laddar sessionens läge
 - [X] Hook 3: stoppar att tester tas bort eller stängs av
-- [ ] Hook 4:
+- [X] Hook 4:format-och-kontroll
 - [ ] Hook 5:
 - [ ] Sessionslogg efter varje arbetspass i `sessions/`
 
