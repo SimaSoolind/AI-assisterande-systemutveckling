@@ -1,5 +1,5 @@
-// Hämtar execFileSync, som kör ett kommando i terminalen och väntar på svaret
-import { execFileSync } from "node:child_process";
+// Hämtar verktyget som kör program i terminalen
+import child_process from "node:child_process";
 // Hämtar process, som har stdin, stderr och exit
 import process from "node:process";
 
@@ -16,25 +16,30 @@ try {
   process.exit(0);
 }
 
-// Vilken fil ändrade Claude? Tom text om det inte finns någon
-const fil = anrop.tool_input?.file_path ?? "";
+// Uppgifterna om ändringen. Saknas de? Avsluta tyst
+const andring = anrop.tool_input;
+if (andring === undefined) process.exit(0);
 
-// Är filen inte en TypeScript-fil? Då kontrollerar vi inget. Avsluta med kod 0
-if (!fil.endsWith(".ts")) process.exit(0);
+// Vilken fil ändrade Claude?
+const fil = andring.file_path;
+// Saknas filnamnet, eller är det ingen TypeScript-fil? Då kontrollerar vi inget
+if (fil === undefined || !fil.endsWith(".ts")) process.exit(0);
 
 // Försök köra de tre verktygen, ett i taget
 try {
   // 1. Prettier formaterar filen: indrag, citattecken, semikolon
-  execFileSync("npx", ["prettier", "--write", fil], { stdio: "pipe" });
+  child_process.execFileSync("npx", ["prettier", "--write", fil], { stdio: "pipe" });
   // 2. tsc kontrollerar typerna i hela projektet
-  execFileSync("npx", ["tsc", "--noEmit"], { stdio: "pipe" });
+  child_process.execFileSync("npx", ["tsc", "--noEmit"], { stdio: "pipe" });
   // 3. ESLint kontrollerar kodstandarden i filen som ändrades
-  execFileSync("npx", ["eslint", fil], { stdio: "pipe" });
+  child_process.execFileSync("npx", ["eslint", fil], { stdio: "pipe" });
 } catch (fel) {
-  // Felmeddelandet som verktyget skrev ut
-  const felText = fel.stdout.toString() + fel.stderr.toString();
+  // Det verktyget skrev ut, som vanlig text
+  const utskrift = fel.stdout.toString();
+  // Felmeddelandena från verktyget, som vanlig text
+  const felutskrift = fel.stderr.toString();
   // Skicka felet till Claude, med en uppmaning att rätta
-  process.stderr.write("Kontrollen hittade fel. Rätta dem innan du går vidare:\n" + felText);
+  process.stderr.write("Kontrollen hittade fel. Rätta dem innan du går vidare:\n" + utskrift + felutskrift);
   // Kod 2: Claude får se felet och måste rätta
   process.exit(2);
 }

@@ -1,5 +1,5 @@
-// Hämtar verktyg för att läsa, lista, skriva och kolla filer
-import { readFileSync, readdirSync, writeFileSync, existsSync } from "node:fs";
+// Hämtar verktyget för filer och mappar
+import fs from "node:fs";
 // Hämtar process, som har stdin och exit
 import process from "node:process";
 
@@ -20,7 +20,7 @@ try {
 const transkriptFil = anrop.transcript_path;
 
 // Läs hela transkriptet som text
-const transkriptText = readFileSync(transkriptFil, "utf8");
+const transkriptText = fs.readFileSync(transkriptFil, "utf8");
 // Dela upp texten i en lista. En rad är en händelse i chatten
 const transkriptRader = transkriptText.split("\n");
 
@@ -70,7 +70,7 @@ for (const rad of transkriptRader) {
 }
 
 // Alla namn i mappen sessions, till exempel pass-1.md, bevis och .gitkeep
-const allaNamn = readdirSync("sessions");
+const allaNamn = fs.readdirSync("sessions");
 // Räknare för hur många loggar som finns
 let antalLoggar = 0;
 // Gå igenom namnen, ett i taget
@@ -87,7 +87,7 @@ const nummer = antalLoggar + 1;
 const loggFil = `sessions/pass-${nummer}.md`;
 
 // Finns filen redan? Skriv inte över den. Din egen logg ska aldrig försvinna
-if (existsSync(loggFil)) process.exit(0);
+if (fs.existsSync(loggFil)) process.exit(0);
 
 // En tom lista. Varje rad i loggen läggs till här, en i taget
 const loggRader = [];
@@ -114,4 +114,4 @@ loggRader.push("## Förbrukning");
 // Sätt ihop alla rader till en text, med en tom rad emellan
 const loggText = loggRader.join("\n\n");
 // Skriv loggen till sessions/
-writeFileSync(loggFil, loggText);
+fs.writeFileSync(loggFil, loggText);
