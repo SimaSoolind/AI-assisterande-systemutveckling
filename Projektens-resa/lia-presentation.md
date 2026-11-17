@@ -34,8 +34,8 @@ Grund till intervjun 23 nov och till sida B. Varje del är en mening jag kan sä
 | SQL injection | en påhittad rabattkod gav 10 % rabatt – stängd och bevisad |
 | Behörigheter | agenten nekades att läsa `.env` och att radera `.venv` |
 | Sårbara paket | 3 hittade med `npm audit`, 2 lagade, 1 dokumenterat riskbeslut |
-| Kostnad | ca 38 $ för hela projektet (API-pris), över 98 % var cache-läsning |
-| Tid | ca 17,6 timmar aktiv tid |
+| Kostnad | ca 38 USD för hela projektet (API-pris), över 98 % var cache-läsning |
+| Tid | ca 17,6 h aktiv tid i chatten – min egen arbetstid var längre, t.ex. 10 h den 17 nov |
 
 ## 5. Varför det passar för LIA
 - **Säkerhet:** 10 risker hittade och märkta 🔴🟡🟢, och flera lagade och bevisade (se 02-riskbedomning.md).
