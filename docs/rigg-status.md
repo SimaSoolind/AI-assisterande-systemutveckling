@@ -1,6 +1,6 @@
 # 🛠 Riggen – status
 
-Uppdaterad automatiskt 2026-11-16. Hela manualen: [rigg-mall.md](rigg-mall.md) · 📖 → 🛠 Riggen.
+Uppdaterad automatiskt 2026-11-17. Hela manualen: [rigg-mall.md](rigg-mall.md) · 📖 → 🛠 Riggen.
 
 | Del | Krav | Jag har | Status |
 |-----|------|---------|--------|
@@ -10,7 +10,7 @@ Uppdaterad automatiskt 2026-11-16. Hela manualen: [rigg-mall.md](rigg-mall.md) �
 | Hooks (filer) | minst 5 | 5 | ✅ |
 | Hooks kopplade | i settings.json | 5 | ✅ |
 | ADR | minst 1 | 0 | ❌ 0 av 1 |
-| Plan | docs/plan.md | 0 | ❌ 0 av 1 |
+| Plan | docs/plan.md | 1 | ✅ |
 | Codemap | docs/codemap.md | 0 | ❌ 0 av 1 |
 | Sessionsloggar | efter varje pass | 1 | ✅ |
 | /tdd | måste finnas | ja | ✅ |

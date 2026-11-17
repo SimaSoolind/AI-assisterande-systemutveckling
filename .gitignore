@@ -10,3 +10,6 @@ src/legacy/price_calc.log
 
 # Kursmaterial: läses av Claude, publiceras aldrig
 AI-utveckling/
+
+# Min rigg-mall är privat (beslut 17/11)
+docs/rigg-mall.md
