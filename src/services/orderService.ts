@@ -81,3 +81,16 @@ export async function getOrder(orderId: number, customerId: number): Promise<Res
   );
   return ok({ ...order, lines: lines.rows });
 }
+
+// Avbryt en egen beställning: status blir 'cancelled'
+export const cancelOrder = async (orderId: number, customerId: number): Promise<Result<Order>> => {
+  // Kolla att beställningen finns och tillhör kunden (404 / 403)
+  const order = await getOrder(orderId, customerId);
+  if (!order.ok) return order;
+
+  // Ändra status. Värdena skickas som $1, aldrig i texten (SAL F4)
+  await db.query("UPDATE orders SET status = 'cancelled' WHERE id = $1", [orderId]);
+
+  // Hämta beställningen igen, med den nya statusen
+  return getOrder(orderId, customerId);
+};

@@ -69,3 +69,20 @@ describe("GET /orders/:id/price", () => {
     expect(Number(res.body.total)).toBe(1187.5);
   });
 });
+
+describe("POST /orders/:id/cancel", () => {
+  it("avbryter en egen beställning som är lagd inom 30 minuter", async () => {
+    // Skapa en ny beställning, så den är lagd nyss och har status new
+    const created = await request(app)
+      .post("/orders")
+      .set("X-Customer-Id", "1")
+      .send({ lines: [{ product: "Musmatta", quantity: 1, unitPrice: 200 }] });
+    const orderId: number = created.body.id;
+
+    // Avbryt beställningen
+    const res = await request(app).post(`/orders/${orderId}/cancel`).set("X-Customer-Id", "1");
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe("cancelled");
+  });
+});
