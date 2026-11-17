@@ -46,7 +46,7 @@ Filen: `.claude/settings.json`
 |-------|--------|--------|
 | utforskare | haiku | 17 nov – hittade var status läses och skrivs. Visade att `paid` och `shipped` sätts utanför koden (se C8) |
 | granskare | sonnet | 17 nov – granskade Arbete 1 mot planen (se 06-validera.md) |
-| testskrivare | sonnet | inte än – testerna i Arbete 1 skrevs av `/tdd` |
+| testskrivare | sonnet | 17 nov – skrev ett karakteriseringstest för nattrapporten (väg 2), se C4. Testerna i Arbete 1 skrevs av `/tdd`. |
 | sakerhetsgranskare | opus | 17 nov – säkerhetsgranskade Arbete 1 och hittade fynd S2 |
 
 - Granskarna får bara läsa (Read, Grep, Glob).
@@ -254,6 +254,12 @@ Då går nattrapporten sönder, och testerna märker det inte.
 - `tests/conftest.py` sätter testdatabasen före importen, som `env.ts` för Jest.
 - Agenten försökte läsa `.env` och nekades – deny-regeln fungerade (SAL F3).
 - Lösenordet `postgres` i conftest är den lokala testdatabasens. Riktiga hemligheter ligger i `.env`.
+
+**Test för nattrapporten (väg 2)** – skrivet av agenten testskrivare, granskat av mig:
+- `tests/test_nightly_report.py` kör `nightly_report.py 2026-10-07` som en egen process.
+- Svaret ska vara exakt `2026-10-07: 1 betalda ordrar, totalt 689.56 kr`.
+- Nu skyddas båda vägarna in. Testet går sönder om någon byter namn på `conn` eller `calc_price`, eller rättar O1.
+- `npm run test:legacy`: 6 av 6 gröna.
 
 **Kom ihåg:** Jest och pytest delar testdatabasen. Kör dem efter varandra.
 

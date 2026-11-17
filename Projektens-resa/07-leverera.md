@@ -32,4 +32,6 @@ Jag skriver vad jag lärde mig.
 - **Förstå först, ändra sedan:** analys, codemap och karakteriseringstester innan den gamla koden ändrades.
 - **En plan som bara är skriven är en gissning:** migreringsplanen hade ett fel som bara syntes när den provkördes.
 - **Säkerhet från första raden:** `$1` i Node och `%s` med tupel i Python är samma regel (SAL F4).
+- **Gå igenom dokumentationen själv:** när jag läste resan fil för fil hittade jag det som var otydligt,
+  svårläst eller saknades – till exempel att två agenter aldrig hade använts. Då kunde jag rätta det.
 - **Kostnad:** över 98 % av alla tokens var cache-läsning. Planen i en fil och en ny chatt per arbete håller kostnaden nere.
