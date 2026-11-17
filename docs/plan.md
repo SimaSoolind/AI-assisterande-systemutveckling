@@ -13,8 +13,8 @@ Kriterier: docs/arbete-1/1-user-story.md · Research: docs/arbete-1/2-research.m
 
 ## Klart när
 - [X] Alla 8 fall har ett test, och alla tester är gröna (npm test)
-- [ ] npm run lint och npm run typecheck visar 0 fel
-- [ ] npm run format:check visar 0 fel
+- [X] npm run lint och npm run typecheck visar 0 fel
+- [X] npm run format:check visar 0 fel
 - [X] Tiden räknas i databasen med now()
 
 ## Utanför (rör vi inte)
