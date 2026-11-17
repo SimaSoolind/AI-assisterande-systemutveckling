@@ -46,7 +46,7 @@ Riggen är allt som styr agenten. Den ligger i repot, så att den fungerar likad
 19. Koden: route `POST /orders/:id/cancel` och `cancelOrder` i orderService. Grönt: 17 av 17.
 20. Jag granskade varje block: middleware → parseId → getOrder → UPDATE med `$1`.
 
-### Steg 2: efter 30 minuter → 409 – commit `(fylls i efter commit)`
+### Steg 2: efter 30 minuter → 409 – commit `8441a43`
 21. `/tdd Steg 2` skrev testet först: skapar en beställning, flyttar `created_at` 31 minuter bakåt med SQL,
     försöker avbryta och väntar 409. Sist kollar testet att status fortfarande är 'new'. Rött.
 22. Koden: villkoret `created_at > now() - interval '30 minutes'` i samma `UPDATE`.
@@ -68,6 +68,45 @@ Riggen är allt som styr agenten. Den ligger i repot, så att den fungerar likad
 
 **Ord att kunna:** race condition – två anrop samtidigt klarar båda en kontroll innan någon hinner skriva.
 I samma `UPDATE` gör databasen kontroll och ändring i ett enda steg.
+
+### Steg 3: redan avbruten eller skickad → 409 – commit `460a9df` (+ `013973f` bockar av planen)
+24. Testet körs två gånger med `it.each(["cancelled", "shipped"])`. `%s` i namnet visar vilken status som testas.
+25. Koden: `AND status = 'new'` i samma `UPDATE`. Fel status → 0 rader ändras → 409. Grönt: 20 av 20.
+26. Avvägning: samma meddelande för två orsaker ("bara ny, och bara inom 30 minuter").
+    Säkerheten (ingen race condition) går före ett eget meddelande per orsak.
+
+**Om commit-namnen:** `460a9df` heter "Steg 2" men innehåller steg 3. Agenten hade redan committat steg 2 (`8441a43`),
+så när jag committade följde steg 3 med. Commiten var redan pushad, så jag skrev inte om historiken
+(`git push --force` är förbjudet i min rigg). Lärdom: kolla `git log` innan jag committar.
+
+### Steg 4a: någon annans beställning → 403 – commit `a44ec65`
+27. Testet blev grönt direkt, för `getOrder` kollar redan ägaren (från steg 1).
+28. Mutationstest: jag tog bort ägarkollen en kort stund. Testet blev rött. Se 05-testa.md.
+
+### Steg 4b: beställningen finns inte → 404 – commit `20550a3`
+29. Testet avbryter beställning 9999, som inte finns. Grönt direkt, för `getOrder` ger redan 404.
+30. Bevis rött: utan `getOrder` blev svaret 409 i stället för 404. Kunden hade fått fel förklaring
+    ("bara inom 30 minuter") för en beställning som inte finns.
+31. Lärdom: kolla att raden finns **före** `UPDATE`. `rowCount === 0` kan betyda tre saker: finns inte, fel status, för sent.
+
+### Steg 5a: inte inloggad → 401 – commit `e442a28`
+32. Testet skickar ingen `X-Customer-Id`. Grönt direkt, för middlewaren `requireCustomer` ger redan 401.
+33. Bevis: när `requireCustomer` togs bort startade inte ens testerna. **TypeScript** stoppade först:
+    `customerId` saknas, eftersom ingen middleware har kollat inloggningen.
+34. Två vakter för inloggning – granskning i lager (AI D2-F5):
+
+| Vakt | När den larmar | Verktyg |
+|------|----------------|---------|
+| TypeScript | när koden skrivs | typecheck + hooken format-och-kontroll (SAST, SAL F4) |
+| 401-testet | när koden körs | npm test |
+
+35. Varför behövs testet om TypeScript redan stoppar? TypeScript kollar att koden **ser rätt ut**.
+    Testet kollar att den **gör rätt**: svaret blir 401 och ingenting ändras.
+
+### Problem 5: mallen kom med i Git
+- Orsak: `git add .` tar med allt, även `docs/rigg-mall.md`.
+- Lösning: `git rm --cached docs/rigg-mall.md` + rad i `.gitignore`. Commit `9a60e1e`.
+- Lärdom: skriv filnamnen i `git add`, inte bara en punkt.
 
 ### Problem 3: Testerna fick fel databas
 - Fel: `password authentication failed for user "postgres"`.
