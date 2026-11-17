@@ -6,9 +6,12 @@ import { calcPrice } from "../pricing/legacyPrice";
 
 export const orders = Router();
 
+// Största värdet en INTEGER (SERIAL) kan ha i Postgres
+const MAX_INTEGER = 2147483647;
+
 function parseId(raw: string): number | null {
   const id = Number(raw);
-  return Number.isInteger(id) && id > 0 ? id : null;
+  return Number.isInteger(id) && id > 0 && id <= MAX_INTEGER ? id : null;
 }
 
 // Lägg en beställning.

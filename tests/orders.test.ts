@@ -189,4 +189,12 @@ describe("POST /orders/:id/cancel", () => {
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe("invalid_input");
   });
+
+  it("returnerar 400 när id är större än databasens största heltal", async () => {
+    // 3000000000 är större än 2147483647, som är max för en INTEGER i Postgres
+    const res = await request(app).post("/orders/3000000000/cancel").set("X-Customer-Id", "1");
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("invalid_input");
+  });
 });
