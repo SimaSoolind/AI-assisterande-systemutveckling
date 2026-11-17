@@ -1,152 +1,226 @@
 # Steg 4: Bygga med säkerhet
-Bygg ett litet steg i taget. Följ kodstandarden. Kontrollera all indata. Inga hemligheter i koden.
+**Regler – så här gör jag:** Jag bygger ett litet steg i taget. Jag följer kodstandarden.
+Jag kontrollerar all indata. Jag lägger aldrig hemligheter i koden.
 
-## Del A: Riggen (15–16 nov)
-Riggen är allt som styr agenten. Den ligger i repot, så att den fungerar likadant för alla.
+## Översikt
 
-### Behörigheter (lördag 15/nov) – commit `eed4d99`
-1. Skrev `.claude/settings.json` med allow, ask och deny.
-2. allow: `npm test`, `npm run lint`, `git status`, `git diff` – bara läsa och kontrollera.
-3. ask: `git commit`, `git push`, `npm install` – agenten frågar mig först.
-4. deny: läsa `.env`, `rm -rf`, `git push --force` – aldrig.
+| Del | Vad | När |
+|-----|-----|-----|
+| A | Riggen: behörigheter, skills, subagenter, hooks, ESLint | 15–17 nov |
+| B | Arbete 1: avbryta en beställning | 17 nov |
+| C | Arbete 3: modernisera price_calc.py | 17 nov |
+| D | Problem jag löste | 16–17 nov |
+| E | Säkerhet och lärdomar (längst ner i filen) | hela arbetet, 15–17 nov |
 
-### Skills och subagenter (söndag 16/nov) – commits `f251c00`, `916ac69`
-5. Skill `/tdd`: ett steg ur docs/plan.md, test först, väntar på min granskning.
-6. Skill `/logg`: utkast till sessionslogg. Skill `/codemap`: karta över koden.
-7. Fyra subagenter: utforskare (haiku), granskare (sonnet), testskrivare (sonnet), sakerhetsgranskare (opus).
-   Granskarna får bara läsa (Read, Grep, Glob). maxTurns 10 stoppar en agent som fastnar.
+---
 
-### Fem hooks (söndag 16/nov) – commits `02bf10b` till `5ab649d`
-8. `skydda-tester` (PreToolUse) – stoppar om ett test tas bort eller får `.skip`. Exit 2.
-9. `las-logg` (SessionStart) – läser senaste sessionsloggen. Minneskedjan, del 1.
-10. `skriv-logg` (SessionEnd) – skriver ett utkast till nästa logg. Minneskedjan, del 2.
-11. `format-och-kontroll` (PostToolUse) – kör prettier, tsc och eslint efter varje ändring.
-12. `stoppa-hemligheter` (PreToolUse) – stoppar ändring i `.env` och nycklar i koden.
-13. Testade varje hook med egen indata: `echo '{...}' | node .claude/hooks/x.mjs; echo $?`
+# Del A: Riggen
 
-### ESLint med säkerhetsregler och egen regel (måndag 17/nov) – commit `d7fffeb`
-SAL säger: ett fel som hittas tidigt är billigast att rätta (shift-left).
-14. `npm install -D eslint-plugin-security` – gratis paket (SAST, SAL F4). `-D` = bara för utveckling.
-15. Egen regel ur docs/standard.md i `eslint.config.js`: SQL byggs aldrig med `${}`.
-    Felmeddelandet säger hur felet rättas: "Använd $1 och skicka värdet i en lista: db.query(sql, [värde])."
-16. Testade regeln med en tillfällig fil: SQL med `${id}` → error. SQL med `$1` → inget fel. Filen raderad.
-17. `npm run lint`: 0 fel, 2 varningar (`readFileSync` med variabel i tests/helpers/db.ts – testkod, ofarligt).
-    Enligt min regel: nya varningar får vara varningar först.
-18. Hooken format-och-kontroll kör eslint efter varje ändring, så regeln stoppar agenten direkt (exit 2).
+Riggen är allt som styr agenten.
+Den ligger i repot, så att den fungerar likadant för alla.
 
-**Varför billigare:** paketet kör på millisekunder och kostar 0 kr. Opus-agenten kostar tokens.
-Därför: gratis kontroller först, dyr AI-granskning sist (granskning i lager).
+## A1. Behörigheter
+**Commit:** `eed4d99` · 15 nov
 
-### Problem 1: Hooken kraschade på texten null
-- Fel: `TypeError: Cannot read properties of null (reading 'tool_input')`.
-- Orsak: `JSON.parse("null")` är giltigt, men ger inget objekt.
-- Lösning: try/catch runt `JSON.parse` och `if (anrop === null) process.exit(0)`. Commit `5ab649d`.
+| Lista | Vad | Varför |
+|-------|-----|--------|
+| allow | `npm test`, `npm run lint`, `git status`, `git diff` | bara läsa och kontrollera |
+| ask | `git commit`, `git push`, `npm install` | agenten frågar mig först |
+| deny | läsa `.env`, `rm -rf`, `git push --force` | aldrig |
 
-### Problem 2: .env.local stoppades inte
-- Orsak: `fil.endsWith(".env")` fångar bara exakt `.env`.
-- Lösning: alla filer som heter `.env` eller börjar med `.env.` stoppas, utom mallen `.env.example`.
+Filen: `.claude/settings.json`
 
-## Del B: Arbete 1 – Avbryta en beställning (måndag 17/nov)
+## A2. Skills
+**Commit:** `f251c00`, `916ac69` · 16 nov
 
-### Krav, research och plan – commit `1b4b537`
-14. Valde user story 2: avbryta en beställning inom 30 minuter. Varför: docs/arbete-1/1-user-story.md.
-15. Skrev 8 acceptanskriterier i formen Givet/När/Så (200, 400, 401, 403, 404, 409).
-16. Research: requireCustomer (401), parseId (400), getOrder (403/404) och felkoden conflict (409) fanns redan.
-17. Plan i docs/plan.md med 6 steg, Klart när och Utanför.
+| Skill | Gör |
+|-------|-----|
+| `/tdd` | ett steg ur docs/plan.md, test först, väntar på min granskning |
+| `/logg` | utkast till sessionslogg |
+| `/codemap` | karta över koden |
 
-### Steg 1: avbryta inom 30 minuter – commit `8cad505`
-18. `/tdd Steg 1` skrev testet först. Rött: 404, för routen fanns inte.
-19. Koden: route `POST /orders/:id/cancel` och `cancelOrder` i orderService. Grönt: 17 av 17.
-20. Jag granskade varje block: middleware → parseId → getOrder → UPDATE med `$1`.
+## A3. Subagenter
+**Commit:** `916ac69` · 16 nov
 
-### Steg 2: efter 30 minuter → 409 – commit `8441a43`
-21. `/tdd Steg 2` skrev testet först: skapar en beställning, flyttar `created_at` 31 minuter bakåt med SQL,
-    försöker avbryta och väntar 409. Sist kollar testet att status fortfarande är 'new'. Rött.
-22. Koden: villkoret `created_at > now() - interval '30 minutes'` i samma `UPDATE`.
-    `rowCount === 0` betyder att ingen rad ändrades → `err("conflict")` → 409. Grönt: 18 av 18.
-23. Lint, typecheck och format:check: 0 fel.
+| Agent | Modell | Använd |
+|-------|--------|--------|
+| utforskare | haiku | 17 nov – hittade var status läses och skrivs. Visade att `paid` och `shipped` sätts utanför koden (se C8) |
+| granskare | sonnet | 17 nov – granskade Arbete 1 mot planen (se 06-validera.md) |
+| testskrivare | sonnet | inte än – testerna i Arbete 1 skrevs av `/tdd` |
+| sakerhetsgranskare | opus | 17 nov – säkerhetsgranskade Arbete 1 och hittade fynd S2 |
 
-**Alternativ jag valde bort (för testet):**
+- Granskarna får bara läsa (Read, Grep, Glob).
+- `maxTurns: 10` stoppar en agent som fastnar.
+
+## A4. Fem hooks
+**Commit:** `02bf10b` till `5ab649d` · 16 nov
+
+| Hook | När | Gör |
+|------|-----|-----|
+| `skydda-tester` | före en ändring | stoppar om ett test tas bort eller får `.skip` (exit 2) |
+| `stoppa-hemligheter` | före en ändring | stoppar ändring i `.env` och nycklar i koden |
+| `format-och-kontroll` | efter en ändring | kör prettier, tsc och eslint |
+| `las-logg` | när en session startar | läser senaste loggen (minneskedjan, del 1) |
+| `skriv-logg` | när en session slutar | skriver utkast till nästa logg (minneskedjan, del 2) |
+
+**Hur jag testade:** varje hook med egen indata.
+`echo '{...}' | node .claude/hooks/x.mjs; echo $?`
+
+## A5. ESLint med säkerhetsregler
+**Commit:** `d7fffeb` · 17 nov
+
+**Varför:** SAL säger att ett fel som hittas tidigt är billigast att rätta (shift-left).
+
+**Vad jag gjorde:**
+- `npm install -D eslint-plugin-security` – gratis paket (SAST, SAL F4).
+- `-D` betyder: bara för utveckling.
+- En egen regel ur docs/standard.md: SQL byggs aldrig med `${}`.
+
+**Felmeddelandet säger hur felet rättas:**
+"Använd $1 och skicka värdet i en lista: db.query(sql, [värde])."
+
+**Hur jag testade:**
+| Kod i en tillfällig fil | Resultat |
+|-------------------------|----------|
+| SQL med `${id}` | error |
+| SQL med `$1` | inget fel |
+
+Filen raderades efteråt.
+
+**Resultat:**
+- `npm run lint`: 0 fel, 2 varningar.
+- Varningarna gäller `readFileSync` i tests/helpers/db.ts – testkod, ofarligt.
+- Min regel: nya varningar får vara varningar först.
+- Hooken `format-och-kontroll` kör eslint efter varje ändring. Regeln stoppar agenten direkt.
+
+**Varför billigare:**
+- Paketet kör på millisekunder och kostar 0 kr.
+- Opus-agenten kostar tokens.
+- Därför: gratis kontroller först, dyr AI-granskning sist.
+
+---
+
+# Del B: Arbete 1 – Avbryta en beställning
+
+## B1. Krav, research och plan
+**Commit:** `1b4b537`
+
+| Vad | Var |
+|-----|-----|
+| User story 2: avbryta inom 30 minuter | docs/arbete-1/1-user-story.md |
+| 8 acceptanskriterier (200, 400, 401, 403, 404, 409) | samma fil |
+| Research: vad som redan fanns | docs/arbete-1/2-research.md |
+| Plan med 6 steg, Klart när och Utanför | docs/plan.md |
+
+**Det som redan fanns:**
+| Kod | Ger |
+|-----|-----|
+| `requireCustomer` | 401 |
+| `parseId` | 400 |
+| `getOrder` | 403 och 404 |
+| felkoden `conflict` | 409 |
+
+## B2. Steg 1: avbryta inom 30 minuter
+**Commit:** `8cad505`
+
+| | |
+|---|---|
+| **Test först** | `/tdd Steg 1` skrev testet. Rött: 404, routen fanns inte. |
+| **Koden** | route `POST /orders/:id/cancel` och `cancelOrder` |
+| **Resultat** | grönt: 17 av 17 |
+| **Min granskning** | block för block: middleware → parseId → getOrder → UPDATE med `$1` |
+
+## B3. Steg 2: efter 30 minuter → 409
+**Commit:** `8441a43`
+
+| | |
+|---|---|
+| **Test först** | skapar en beställning, flyttar `created_at` 31 minuter bakåt, väntar 409, kollar att status är kvar `new`. Rött. |
+| **Koden** | `created_at > now() - interval '30 minutes'` i samma `UPDATE` |
+| **Hur 409 blir** | `rowCount === 0` → ingen rad ändrades → `conflict` → 409 |
+| **Resultat** | grönt: 18 av 18. Lint, typer och format: 0 fel. |
+
+**Valde bort för testet:**
 | Alternativ | Varför inte |
 |------------|-------------|
-| Beställning 1042 ur seed | status 'paid' – fel orsak till 409 |
+| Beställning 1042 | status `paid` – fel orsak till 409 |
 | Låtsasklocka i Jest | tiden räknas i databasen, inte i Node |
 | Vänta 31 minuter | för långsamt |
 
-**Alternativ jag valde bort (för 30-minutersregeln):**
+**Valde bort för 30-minutersregeln:**
 | Alternativ | Varför inte |
 |------------|-------------|
-| Jämföra i Node med `Date.now()` | två klockor kan visa olika tid, och race condition mellan läsning och skrivning |
+| Jämföra i Node med `Date.now()` | två klockor, och race condition |
 | Databasregel (trigger eller CHECK) | kräver migrering, och planen säger inga tabelländringar |
 
-**Ord att kunna:** race condition – två anrop samtidigt klarar båda en kontroll innan någon hinner skriva.
-I samma `UPDATE` gör databasen kontroll och ändring i ett enda steg.
+**Ord att kunna – race condition:**
+Två anrop samtidigt klarar båda en kontroll innan någon hinner skriva.
+I samma `UPDATE` gör databasen kontroll och ändring i ett steg.
 
-### Steg 3: redan avbruten eller skickad → 409 – commit `460a9df` (+ `013973f` bockar av planen)
-24. Testet körs två gånger med `it.each(["cancelled", "shipped"])`. `%s` i namnet visar vilken status som testas.
-25. Koden: `AND status = 'new'` i samma `UPDATE`. Fel status → 0 rader ändras → 409. Grönt: 20 av 20.
-26. Avvägning: samma meddelande för två orsaker ("bara ny, och bara inom 30 minuter").
-    Säkerheten (ingen race condition) går före ett eget meddelande per orsak.
+## B4. Steg 3: redan avbruten eller skickad → 409
+**Commit:** `460a9df` (och `013973f` bockar av planen)
 
-**Om commit-namnen:** `460a9df` heter "Steg 2" men innehåller steg 3. Agenten hade redan committat steg 2 (`8441a43`),
-så när jag committade följde steg 3 med. Commiten var redan pushad, så jag skrev inte om historiken
-(`git push --force` är förbjudet i min rigg). Lärdom: kolla `git log` innan jag committar.
+| | |
+|---|---|
+| **Test först** | körs två gånger: `it.each(["cancelled", "shipped"])` |
+| **Koden** | `AND status = 'new'` i samma `UPDATE` |
+| **Resultat** | grönt: 20 av 20 |
+| **Avvägning** | samma meddelande för två orsaker. Säkerheten går före ett eget meddelande per orsak. |
 
-### Steg 4a: någon annans beställning → 403 – commit `a44ec65`
-27. Testet blev grönt direkt, för `getOrder` kollar redan ägaren (från steg 1).
-28. Mutationstest: jag tog bort ägarkollen en kort stund. Testet blev rött. Se 05-testa.md.
+**Om commit-namnet:**
+- `460a9df` heter "Steg 2" men innehåller steg 3.
+- Agenten hade redan committat steg 2 (`8441a43`).
+- Commiten var pushad, så jag skrev inte om historiken. `git push --force` är förbjudet i min rigg.
+- Lärdom: kolla `git log` innan jag committar.
 
-### Steg 4b: beställningen finns inte → 404 – commit `20550a3`
-29. Testet avbryter beställning 9999, som inte finns. Grönt direkt, för `getOrder` ger redan 404.
-30. Bevis rött: utan `getOrder` blev svaret 409 i stället för 404. Kunden hade fått fel förklaring
-    ("bara inom 30 minuter") för en beställning som inte finns.
-31. Lärdom: kolla att raden finns **före** `UPDATE`. `rowCount === 0` kan betyda tre saker: finns inte, fel status, för sent.
+## B5. Steg 4 och 5: felfallen
+Alla fyra tester blev gröna direkt, för koden fanns redan.
+Därför bevisade jag dem: jag tog bort skyddet en kort stund och såg testet bli rött (mutationstest, se 05-testa.md).
 
-### Steg 5a: inte inloggad → 401 – commit `e442a28`
-32. Testet skickar ingen `X-Customer-Id`. Grönt direkt, för middlewaren `requireCustomer` ger redan 401.
-33. Bevis: när `requireCustomer` togs bort startade inte ens testerna. **TypeScript** stoppade först:
-    `customerId` saknas, eftersom ingen middleware har kollat inloggningen.
-34. Två vakter för inloggning – granskning i lager (AI D2-F5):
+| Fall | Svar | Skydd | Utan skyddet | Commit |
+|------|------|-------|--------------|--------|
+| Någon annans beställning | 403 | `getOrder` | status blev `cancelled` – rött | `a44ec65` |
+| Finns inte (9999) | 404 | `getOrder` | 409 i stället för 404 – rött | `20550a3` |
+| Inte inloggad | 401 | `requireCustomer` | TypeScript stoppade koden | `e442a28` |
+| id är "banan" | 400 | `parseId` | anropet hängde | `4ffe276` |
 
-| Vakt | När den larmar | Verktyg |
-|------|----------------|---------|
-| TypeScript | när koden skrivs | typecheck + hooken format-och-kontroll (SAST, SAL F4) |
-| 401-testet | när koden körs | npm test |
+**Lärdom från 404:**
+Kolla att raden finns före `UPDATE`.
+`rowCount === 0` kan betyda tre saker: finns inte, fel status, för sent.
 
-35. Varför behövs testet om TypeScript redan stoppar? TypeScript kollar att koden **ser rätt ut**.
-    Testet kollar att den **gör rätt**: svaret blir 401 och ingenting ändras.
+**Två vakter för inloggning (granskning i lager):**
+| Vakt | Larmar när | Verktyg |
+|------|------------|---------|
+| TypeScript | koden skrivs | typecheck + hooken format-och-kontroll |
+| 401-testet | koden körs | npm test |
 
-### Steg 5b: id är inte ett tal → 400 – commit `4ffe276`
-36. Testet skickar `POST /orders/banan/cancel`. Grönt direkt, för `parseId` ger redan 400.
-37. Bevis: utan `parseId` hängde anropet. Se 05-testa.md och den höjda risken i 02-riskbedomning.md.
-38. Valde bort zod här: bara ett id ska valideras, och `parseId` används redan i två andra routes.
+TypeScript kollar att koden **ser rätt ut**.
+Testet kollar att den **gör rätt**.
 
-### Problem 3: Testerna fick fel databas
-- Fel: `password authentication failed for user "postgres"`.
-- Orsak: mitt Node-projekt Skär använder också port 5433. Dess databas var igång.
-- Lösning: `docker stop hotell-solsidan-db` och `npm run db:up`.
+**Valde bort zod för id:** bara ett id ska valideras, och `parseId` används redan i två routes.
 
-### Problem 4: Pristestet rött igen
-- Orsak: `.venv` var inte aktiverad, så Python hittade inte psycopg.
-- Lösning: `source .venv/bin/activate`. Inte ett fel i koden.
+---
 
-### Problem 5: mallen kom med i Git
-- Orsak: `git add .` tar med allt, även `docs/rigg-mall.md`.
-- Lösning: `git rm --cached docs/rigg-mall.md` + rad i `.gitignore`. Commit `9a60e1e`.
-- Lärdom: skriv filnamnen i `git add`, inte bara en punkt.
+# Del C: Arbete 3 – Modernisera price_calc.py
 
-## Del C: Arbete 3 – Modernisering av price_calc.py (måndag 17/nov)
-Regeln: förstå först, lås fast beteendet med tester, ändra sedan i små steg.
+**Regeln:** förstå först → lås fast beteendet med tester → ändra i små steg.
 
-### Steg 1: Analys – `docs/analys-price-calc.md` – commit `748e015`
-39. Sökte efter alla anrop: filen används på **två** ställen – API:t (`src/pricing/legacyPrice.ts`) och nattrapporten (`jobs/nightly_report.py`).
-40. Sidoeffekter: öppnar databasen redan när filen laddas, och skriver fel tyst till en loggfil.
-41. Tre osäkerheter: **O1** utgången rabatt (1045), **O2** momsen kapas (1044), **O3** beställning utan rader (1043).
-42. Säkerhet: SQL injection på rad 42 – rabattkoden från kunden byggs in med `%` (SAL F4). Noterat, inte rättat än.
+## C1. Analys
+**Commit:** `748e015` · **Fil:** docs/analys-price-calc.md
 
-### Steg 2: Codemap – `docs/codemap.md` – committas med resan
-51. En rad per fil i `src/`, `jobs/`, `scripts/` och `db/`: vad den gör och vad den anropar.
-52. Två vägar in till `price_calc.py`, kontrollerade mot koden:
+| Fynd | Vad |
+|------|-----|
+| Två vägar in | API:t (`src/pricing/legacyPrice.ts`) och nattrapporten (`jobs/nightly_report.py`) |
+| Sidoeffekter | öppnar databasen när filen laddas, skriver fel tyst till en loggfil |
+| O1 | en utgången rabatt dras ändå av (order 1045) |
+| O2 | momsen kapas i stället för att avrundas (order 1044) |
+| O3 | en beställning utan rader får pris 0 (order 1043) |
+| Säkerhet | SQL injection på rad 42 – rabattkoden byggs in med `%` |
+
+## C2. Codemap
+**Commit:** `b6a0af6` · **Fil:** docs/codemap.md
+
+En rad per fil: vad den gör och vad den anropar.
 
 | | Väg 1: API | Väg 2: nattrapporten |
 |---|------------|----------------------|
@@ -154,111 +228,164 @@ Regeln: förstå först, lås fast beteendet med tester, ändra sedan i små ste
 | Hur | startar Python som egen process | `from price_calc import calc_price, conn` |
 | Behörighet | `requireCustomer` + `getOrder` | ingen (körs av cron) |
 
-53. Följd för refaktoreringen: rör inte namnen `calc_price` och `conn`. Då går nattrapporten sönder,
-    och karakteriseringstesterna märker det inte – de testar bara `calc_price`.
+**Följd:** rör inte namnen `calc_price` och `conn`.
+Då går nattrapporten sönder, och testerna märker det inte.
 
-### Steg 3: Körning – vad koden svarar i dag – commit `748e015`
-43. `npm run db:reset` och sedan `python3 src/legacy/price_calc.py` för 1040–1047. Tabellen står i analysfilen, avsnitt 7.
-44. Det blev **inte** facit: 1044 och 1045 har buggar. Det är vad koden gör i dag, och testerna ska låsa fast just det.
+## C3. Körning: vad koden svarar i dag
+**Commit:** `748e015`
 
-### Steg 4: Fem karakteriseringstester – `tests/test_price_calc.py` – commit `d625203`
-45. Ett test per beställning: 1042 (grundfall), 1043 (O3), 1044 (O2), 1045 (O1), 1041 (giltig rabatt).
-46. Alla gröna mot den **orörda** filen. Testerna låser fast vad koden gör i dag, även buggarna.
-47. Test 1 jämför med `str(...)`: `Decimal("1187.5") == Decimal("1187.50")` är sant, så bara `str` märker formen `"1187.5"`.
-48. `tests/conftest.py` sätter testdatabasen **före** importen (som `env.ts` för Jest).
-    Förut fungerade testerna bara om jag satte `DATABASE_URL` själv. Nu räcker `npm run test:legacy`.
-49. Agenten försökte läsa `.env` och nekades – deny-regeln i `settings.json` fungerade (SAL F3).
-50. Lösenordet `postgres` i conftest är den lokala testdatabasens, samma som i `env.ts`. Riktiga hemligheter ligger i `.env`.
+- `npm run db:reset`, sedan `python3 src/legacy/price_calc.py` för order 1040–1047.
+- Tabellen står i analysfilen, avsnitt 7.
+- Det blev **inte** facit: 1044 och 1045 har buggar. Det är vad koden gör i dag.
 
-**Att komma ihåg:** Jest och pytest delar testdatabasen. Kör dem efter varandra, inte samtidigt.
+## C4. Fem karakteriseringstester
+**Commit:** `d625203` · **Fil:** tests/test_price_calc.py
 
-### Refaktoreringssteg 1: tydliga namn – commit `b2f37ec`
-54. Bytte otydliga namn i `price_calc.py` till svenska namn som säger vad de är:
-    `x` → `belopp`, `rad` → `orderrad`, `kod` → `rabattkod`, `q, p` → `antal, styckpris`, `r` → `rabattrad`, `f` → `loggfil`.
-55. Rörde inte `calc_price`, `conn`, `Pris` och `.net/.vat/.total` – nattrapporten och testerna använder dem.
-56. Kontroll: 5 karakteriseringstester gröna, 25 Jest-tester gröna, och nattrapporten (väg 2) ger samma svar.
-57. Valde svenska namn: filen är redan på svenska (`summa`, `Pris`, `MOMS`). Engelska hade blandat språk i filen.
+| Order | Låser fast |
+|-------|------------|
+| 1042 | grundfallet och formen `"1187.5"` |
+| 1043 | O3 |
+| 1044 | O2 |
+| 1045 | O1 |
+| 1041 | en giltig rabatt |
 
-**Varför ett säkert första steg?** Ett namnbyte ändrar inte vad koden gör, bara vad sakerna heter.
-Karakteriseringstesterna gav exakt samma svar före och efter – därför skrevs testerna först.
+- Alla gröna mot den **orörda** filen.
+- Test 1 använder `str(...)`, för `Decimal("1187.5") == Decimal("1187.50")` är sant.
+- `tests/conftest.py` sätter testdatabasen före importen, som `env.ts` för Jest.
+- Agenten försökte läsa `.env` och nekades – deny-regeln fungerade (SAL F3).
+- Lösenordet `postgres` i conftest är den lokala testdatabasens. Riktiga hemligheter ligger i `.env`.
 
-**Övervägde men valde bort:** skriva om Python till TypeScript nu. Nattrapporten importerar Python-filen,
-och kursen kräver små steg. Planen för det (strangler fig) står i mall-svar.md under "en vecka till".
+**Kom ihåg:** Jest och pytest delar testdatabasen. Kör dem efter varandra.
 
-### Refaktoreringssteg 2: rabatten i en egen funktion – commit `63ee45a`
-58. Flyttade rabattberäkningen från `calc_price` till en egen funktion `_dra_av_rabatt(cur, rabattkod, summa)`.
-    I `calc_price` står nu en rad i stället för fem.
-59. Exakt samma kod flyttad. `_` först i namnet betyder "intern" i Python – nattrapporten ska inte använda den.
-60. Kommentaren `OBS giltighetsdatumet kontrolleras inte (O1)` – buggen är dokumenterad, inte rättad.
-61. Kontroll: 5 karakteriseringstester gröna (även 1045 med utgången rabatt), 25 Jest-tester gröna,
-    nattrapporten 2026-10-07 ger 689.56 kr – samma som förut.
+## C5. Refaktoreringssteg 1: tydliga namn
+**Commit:** `b2f37ec`
 
-**Varför rättas inte O1 nu?** Refaktorering ändrar hur koden ser ut, inte vad den gör.
-Att rätta O1 ändrar beteendet och kräver ett beslut och en ADR. En sak i taget.
-Nu ligger rabattregeln – och SQL-raden med `%` – på ett ställe, så steg 3 blir lättare.
+| Förut | Nu |
+|-------|-----|
+| `x` | `belopp` |
+| `rad` | `orderrad` |
+| `kod` | `rabattkod` |
+| `q, p` | `antal, styckpris` |
+| `r` | `rabattrad` |
+| `f` | `loggfil` |
 
-### Refaktoreringssteg 3: parametriserad SQL – commit `22a05e4`
-62. Alla tre SQL-frågor i `price_calc.py`: från `'%s'" % värde` (värdet byggs in i texten)
-    till `"%s", (värde,)` (värdet skickas separat). Samma regel som `$1` + `[värde]` i Node (SAL F4, fråga 5a).
-63. Bevis med en elak rabattkod `FINNS_INTE' OR '1'='1`:
+- Rörde inte `calc_price`, `conn`, `Pris` och `.net/.vat/.total`.
+- Svenska namn, för filen är redan på svenska.
+- **Resultat:** 5 + 25 tester gröna, nattrapporten samma svar.
 
+**Varför ett säkert steg?** Ett namnbyte ändrar inte vad koden gör.
+
+**Valde bort:** skriva om Python till TypeScript nu.
+Nattrapporten importerar Python-filen, och kursen kräver små steg.
+Planen (strangler fig) står i mall-svar.md.
+
+## C6. Refaktoreringssteg 2: rabatten i en egen funktion
+**Commit:** `63ee45a`
+
+- Ny funktion `_dra_av_rabatt(cur, rabattkod, summa)`.
+- I `calc_price` står en rad i stället för fem.
+- `_` först betyder "intern" i Python.
+- Kommentaren `OBS giltighetsdatumet kontrolleras inte (O1)`.
+- **Resultat:** 5 + 25 tester gröna, nattrapporten ger 689.56 kr som förut.
+
+**Varför rättas inte O1 nu?**
+Refaktorering ändrar hur koden ser ut, inte vad den gör.
+Att rätta O1 kräver ett beslut och en ADR.
+
+## C7. Refaktoreringssteg 3: säker SQL
+**Commit:** `22a05e4`
+
+| Förut | Nu |
+|-------|-----|
+| `'%s'" % värde` – värdet byggs in i texten | `"%s", (värde,)` – värdet skickas separat |
+
+Samma regel som `$1` i Node (SAL F4, fråga 5a).
+
+**Bevis med en elak rabattkod** `FINNS_INTE' OR '1'='1`:
 | Kod | Resultat |
 |-----|----------|
-| Gamla frågan | fick 10 % rabatt med en kod som inte finns – SQL injection |
-| Nya frågan | ingen rabatt – databasen ser texten som data |
-| Nya frågan med `VAR10` | 100 → 90, rabatten fungerar fortfarande |
+| gamla frågan | fick 10 % rabatt – SQL injection |
+| nya frågan | ingen rabatt |
+| nya frågan med `VAR10` | 100 → 90, fungerar fortfarande |
 
-64. Kontroll: 5 karakteriseringstester gröna, 25 Jest-tester gröna, nattrapporten ger samma svar (O1 och O2 finns kvar).
-65. `(rabattkod,)` – kommatecknet gör det till en tupel med ett värde. Citattecknen runt `%s` togs bort, psycopg sätter dem själv.
+- `(rabattkod,)` – kommatecknet gör det till en tupel.
+- **Resultat:** 5 + 25 tester gröna, nattrapporten samma svar.
+- **Kvar:** `jobs/nightly_report.py:8` har samma mönster. Mindre risk – datumet kommer inte från en kund.
 
-**Kvar:** `jobs/nightly_report.py:8` har samma mönster (`'%s'" % dag`). Mindre risk – `dag` kommer från den som kör jobbet,
-inte från en kund. Står under "en vecka till" i mall-svar.md.
+## C8. Migreringsplan
+**Commit:** `97d51d0` · **Fil:** docs/migreringsplan.md
 
-### Migreringsplan – `docs/migreringsplan.md` – committas med resan
-66. Problemet: databasen tillåter vilken status som helst. Ett stavfel som `'canceled'` sparas tyst,
-    och då hittar `cancelOrder` (`status = 'new'`) och nattrapporten (`status = 'paid'`) inte raden.
-67. Lösningen: en CHECK-regel – bara `new`, `paid`, `shipped`, `cancelled` – införd i expand/contract-steg:
+**Problemet:** databasen tillåter vilken status som helst.
+Ett stavfel som `'canceled'` sparas tyst, och då hittas raden inte.
+
+**Lösningen:** en CHECK-regel – bara `new`, `paid`, `shipped`, `cancelled`.
 
 | Steg | Gör | Går att backa? |
 |------|-----|----------------|
-| 1 Expand | regeln med `NOT VALID` – gäller nya rader direkt | ✅ `DROP CONSTRAINT` |
-| 2 Verifiera | leta efter gamla rader med okänd status | ✅ bara läsning |
-| 3 Rätta gamla rader (om de finns) | kopia + `UPDATE` | ⚠️ bara med kopian – och först efter att regeln är borttagen |
-| 4 Contract | `VALIDATE CONSTRAINT` – gäller alla rader | ✅ `DROP CONSTRAINT` |
-| 5 Städa | regeln in i `schema.sql`, kopian bort | kopian går inte att få tillbaka |
+| 1 Expand | regeln med `NOT VALID` – gäller nya rader | ✅ |
+| 2 Verifiera | leta efter gamla rader med okänd status | ✅ |
+| 3 Rätta gamla rader | kopia + `UPDATE` | ⚠️ bara med kopian, efter att regeln tagits bort |
+| 4 Contract | `VALIDATE CONSTRAINT` – gäller alla rader | ✅ |
+| 5 Städa | regeln in i schema.sql, kopian bort | ❌ kopian |
 
-68. Provkörd i testdatabasen inuti `BEGIN … ROLLBACK`: 0 rader med okänd status, `VALIDATE` gav `true`,
-    och ett stavfel (`'canceled'`) stoppades av regeln. Allt ångrades – databasen är oförändrad.
-69. **Provkörningen hittade ett fel i planen:** att backa steg 3 (lägga tillbaka från kopian) gick inte,
-    för regeln från steg 1 vägrade släppa in det gamla värdet. Rättat: backa i rätt ordning –
-    först ta bort regeln, sedan återställa från kopian. Provkört igen: fungerade.
+**Provkörning** i testdatabasen med `BEGIN … ROLLBACK`:
+- 0 rader med okänd status.
+- `VALIDATE` gav `true`.
+- Stavfelet `'canceled'` stoppades.
+- Allt ångrades.
 
-**Varför inte allt på en gång?** En vanlig CHECK kontrollerar alla gamla rader direkt. Finns en enda felaktig rad
-misslyckas allt, och tabellen kan låsas länge. Stegvis är säkrare, och varje steg kan backas.
+**Provkörningen hittade ett fel i planen:**
+Att backa steg 3 gick inte, för regeln vägrade släppa in det gamla värdet.
+Rättat: först ta bort regeln, sedan återställa från kopian.
+
+**Varför stegvis?** Finns en enda felaktig rad misslyckas en vanlig CHECK, och tabellen kan låsas länge.
+
+**Bekräftat av agenten utforskare (17 nov):**
+| Status | Skrivs av | Läses av |
+|--------|-----------|----------|
+| `new` | databasen (DEFAULT) | `cancelOrder` |
+| `cancelled` | `cancelOrder` | bara tester |
+| `paid` | ingen kod – sätts utifrån | nattrapporten |
+| `shipped` | ingen kod – sätts utifrån | bara tester |
+
+`paid` och `shipped` skrivs utanför koden. Där kan stavfel uppstå, och TypeScript kan inte stoppa dem.
+Därför ska regeln ligga i databasen. Stavningen `'canceled'` finns ingenstans i koden i dag.
 
 ## Arbete 3 är klart ✅
 Codemap, 5 karakteriseringstester, tre refaktoreringssteg med grönt efter varje, och en migreringsplan.
 
-### Problem 6: psycopg saknades igen, sedan fel port
-- Fel 1: `No module named 'psycopg'`. Orsak: `.venv` inte aktiverad. Lösning: `source .venv/bin/activate`.
-- Fel 2: `port 5432 failed: role "postgres" does not exist`. Orsak: filen läser `DATABASE_URL`, och utan `.env`
-  används reservadressen i koden (fynd B4). Lösning: `set -a; source .env; set +a` – laddar `.env` utan att visa den.
+---
+
+# Del D: Problem jag löste
+
+| # | Problem | Orsak | Lösning |
+|---|---------|-------|---------|
+| 1 | Hooken kraschade på `null` | `JSON.parse("null")` ger inget objekt | try/catch och `if (anrop === null)` (`5ab649d`) |
+| 2 | `.env.local` stoppades inte | `endsWith(".env")` fångar bara exakt `.env` | stoppa alla `.env` och `.env.*`, utom `.env.example` |
+| 3 | Testerna fick fel databas | Skär använder också port 5433 | `docker stop hotell-solsidan-db` och `npm run db:up` |
+| 4 | Pristestet var rött | `.venv` inte aktiverad | `source .venv/bin/activate` |
+| 5 | Mallen kom med i Git | `git add .` tar med allt | `git rm --cached` + `.gitignore` (`9a60e1e`). Skriv filnamnen i `git add`. |
+| 6 | psycopg saknades, sedan fel port | `.venv` inte aktiverad, och utan `.env` används reservadressen | `source .venv/bin/activate` och `set -a; source .env; set +a` |
+
+---
+
+# Del E: Säkerhet och lärdomar
 
 ## Säkerhet i det jag byggde (SAL)
 | Fråga | Hur |
 |-------|-----|
-| 5a SQL | `UPDATE ... WHERE id = $1` – aldrig text i SQL |
-| 5b Indata | parseId ger 400 för "banan" |
-| 5c Inloggning | requireCustomer ger 401 |
-| 5d Egen rad | customerId från inloggningen, aldrig från body. getOrder ger 403 |
-| 5e Fel | sendError ger `{ error: { code, message } }`, inga interna detaljer |
+| 5a SQL | `$1` i Node, `%s` med tupel i Python – aldrig text i SQL |
+| 5b Indata | `parseId` ger 400 för "banan" och för stora tal |
+| 5c Inloggning | `requireCustomer` ger 401 |
+| 5d Egen rad | `customerId` från inloggningen. `getOrder` ger 403, och `customer_id` står i `UPDATE`. |
+| 5e Fel | `sendError` ger `{ error: { code, message } }`, inga interna detaljer |
 
 ## Lärdomar
 - Middleware säger ja med `next()` utan svar, eller nej med 401. En förfrågan får bara ett svar.
 - 403 = jag vet vem du är, men du får inte. Gäller både fel roll och någon annans rad.
 - Ett kriterium = en orsak. Därför "10 minuter" i alla fall utom tidsfallet.
 - Testet kontrollerar. Koden gör jobbet. TDD: först rött, sedan grönt.
-- Det svåraste var att skriva user storyn, och att tolka koden. Jag har inte gått igenom alla delar än,
-  och hittills kan jag bara sätta upp ett API.
-- Det som hjälpte: testerna, lint och typkontrollen (hooken format-och-kontroll) kontrollerade koden åt mig.
-  Jag granskade block för block: vad gör varje del, och vilket acceptanskriterium löser den?
+- Det svåraste var att skriva user storyn och att tolka koden.
+  Jag har inte gått igenom alla delar än, och hittills kan jag bara sätta upp ett API.
+- Det som hjälpte: tester, lint och typkontroll kontrollerade koden åt mig.
+  Jag granskade block för block: vad gör varje del, och vilket kriterium löser den?

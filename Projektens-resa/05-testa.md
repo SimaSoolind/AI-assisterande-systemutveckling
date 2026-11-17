@@ -1,5 +1,6 @@
 # Steg 5: Testa
-Skriv tester för det jag har byggt. Kör alla tester, så att inget gammalt har gått sönder.
+**Regler – så här gör jag:** Jag skriver tester för det jag har byggt.
+Jag kör alla tester, så att inget gammalt har gått sönder.
 
 ## Alla tester för Arbete 1 bevisades röda
 | Fall | Test | Grönt direkt? | Vad jag tog bort | Resultat |

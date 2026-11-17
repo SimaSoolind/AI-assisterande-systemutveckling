@@ -14,6 +14,20 @@ Ett stavfel som `'canceled'` eller `'Paid'` sparas utan fel. Då missar koden ra
 
 Tillåtna värden i dag (seed + kod): `new`, `paid`, `shipped`, `cancelled`.
 
+### Varför regeln ska ligga i databasen
+Agenten utforskare sökte igenom `src/`, `jobs/` och `tests/` (17 nov):
+
+| Status | Skrivs av | Läses av |
+|--------|-----------|----------|
+| `new` | databasen (DEFAULT) | cancelOrder |
+| `cancelled` | cancelOrder | bara tester |
+| `paid` | **ingen kod** – sätts utifrån | nattrapporten |
+| `shipped` | **ingen kod** – sätts utifrån | bara tester |
+
+`paid` och `shipped` skrivs utanför koden, av ett annat system eller för hand.
+Där kan stavfel uppstå, och en kontroll i TypeScript stoppar dem inte. Bara en regel i databasen gör det.
+I dag finns stavningen `'canceled'` ingenstans i koden.
+
 ## Varför expand/contract och inte en enda ändring
 
 En vanlig `ALTER TABLE ... ADD CHECK` kontrollerar **alla gamla rader direkt**. Finns en enda rad med okänt värde misslyckas migreringen,

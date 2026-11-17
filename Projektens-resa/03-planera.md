@@ -1,5 +1,6 @@
 # Steg 3: Planera
-Välj vad jag ska bygga eller rätta. Dela upp det i små steg. Skriv vad som ska vara klart när jag är färdig.
+**Regler – så här gör jag:** Jag väljer vad jag ska bygga eller rätta. Jag delar upp det i små steg.
+Jag skriver vad som ska vara klart när jag är färdig.
 
 ## Arbete 1: Avbryta en beställning (17/nov) ✅ planerad
 - User story och 8 acceptanskriterier: `docs/arbete-1/1-user-story.md`
@@ -28,6 +29,9 @@ app.use((error, req, res, next) => {
 **Att tänka på:**
 - Express 4 fångar inte fel i `async`-funktioner automatiskt. Det behövs ett extra steg (lär mig i Node-kursen).
 - Loggen får inte innehålla personuppgifter (namn, e-post). Det säger kodstandarden.
+
+**Status: inte byggd – beslut "senare".** Gäller hela appen, inte bara Arbete 1.
+Risken är bevisad (risk 2 i 02-riskbedomning.md) och beslutet står i docs/arbete-1/3-granskning.md (S1/B3).
 
 **Klart när:**
 - [ ] Ett test visar att ett databasfel ger 500.

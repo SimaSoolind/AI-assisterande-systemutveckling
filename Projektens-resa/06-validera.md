@@ -1,5 +1,6 @@
 # Steg 6: Validera
-Kontrollera att jag har byggt rätt sak. Stämmer det med planen och kraven? Kör lint och typecheck.
+**Regler – så här gör jag:** Jag kontrollerar att jag har byggt rätt sak. Stämmer det med planen och kraven?
+Jag kör lint och typecheck.
 
 ## Arbete 1: Klart när i docs/plan.md (måndag 17/nov)
 | Klart när | Kommando | Resultat |
@@ -75,3 +76,30 @@ Det automatiska testet (`it.each`) visar `shipped` ensamt.
 ## Arbete 1 är klart ✅
 Alla rutor i checklistan: user story, acceptanskriterier, research, plan, bygg med tester först,
 granska, verifiera, ADR och små commits.
+
+## Slutkontroll av hela projektet (måndag 17/nov)
+| Kontroll | Verktyg | Typ | Resultat |
+|----------|---------|-----|----------|
+| 25 API-tester | Jest + supertest | test | ✅ 25 av 25 |
+| 5 karakteriseringstester | pytest | test | ✅ 5 av 5 |
+| Kodstandard + säkerhetsregler | ESLint + eslint-plugin-security | SAST | ✅ 0 fel, 2 varningar (testkod) |
+| Typer | tsc | SAST | ✅ 0 fel |
+| Formatering | prettier | – | ✅ |
+| Sårbara paket | npm audit | SCA | se nedan |
+
+### npm audit – commit `dd3fc80`
+`npm audit` visade **46 sårbarheter**. Det lät mycket, men det var bara **3 paket** – npm räknar också
+varje paket som använder ett sårbart paket.
+
+| Paket | Allvar | Används i | Åtgärd |
+|-------|--------|-----------|--------|
+| `body-parser` | hög (DoS) | appen, produktion | ✅ lagad med `npm audit fix` |
+| `minimatch` | medel | Jest, ESLint | ✅ lagad med `npm audit fix` |
+| `picomatch` | hög (ReDoS) | Jest, ESLint | ⚠️ kvar – riskbeslut |
+
+- Efter `npm audit fix`: 25 + 5 tester gröna, lint och typer 0 fel. **I produktion: 0 sårbarheter.**
+- `picomatch`: npm föreslår att nedgradera Jest 29 → 26 (från 2020). Det vore sämre.
+  Risken är liten: det är bara ett utvecklingsverktyg, och sökmönstren skrivs av oss, inte av kunder.
+  **Beslut:** acceptera risken tills Jest släpper en version med ny picomatch. Kör `npm audit` igen då.
+- Lärdom: `npm audit fix` utan `--force` uppdaterar bara till säkra versioner som inte bryter något.
+  `--force` kan göra stora versionsbyten, som nedgraderingen av Jest.
