@@ -1,4 +1,6 @@
 # Plan – Arbete 1: Avbryta en beställning
+> Detaljplan för Arbete 1. Hela kursprojektets checklista: [projektbeskrivning.md](projektbeskrivning.md).
+
 
 **Mål:** En kund kan avbryta sin egen beställning inom 30 minuter.
 Kriterier: docs/arbete-1/1-user-story.md · Research: docs/arbete-1/2-research.md

@@ -1,4 +1,6 @@
 # Kursprojekt: En rigg för en kodbas
+> Kursprojektets krav som checklista. Detaljplanen för det jag byggde i Arbete 1: [plan.md](plan.md).
+
 AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation enligt mallen och muntlig redovisning
 
 ---
@@ -23,7 +25,7 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [X] Hook 3: stoppar att tester tas bort eller stängs av
 - [X] Hook 4:format-och-kontroll
 - [X] Hook 5:stoppa-hemligheter
-- [ ] Sessionslogg efter varje arbetspass i `sessions/`
+- [X] Sessionslogg efter varje arbetspass i `sessions/`
 
 ### Arbete 1: Ny funktion
 - [X] Välj user story
@@ -48,10 +50,10 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [X] Refaktoreringssteg 1, gröna tester
 - [X] Refaktoreringssteg 2, gröna tester
 - [X] Refaktoreringssteg 3, gröna tester
-- [ ] Migreringsplan för databasen i reversibla steg
+- [X] Migreringsplan för databasen i reversibla steg
 
 ### Inlämning
-- [ ] Mallen ifylld som PDF (sidorna 4 till 9 i kursmaterialet)
+- [X] Mallen ifylld som PDF (sidorna 4 till 9 i kursmaterialet)
 - [ ] Repot taggat `inlamning`
 - [ ] Redovisning förberedd (19 nov)
 
