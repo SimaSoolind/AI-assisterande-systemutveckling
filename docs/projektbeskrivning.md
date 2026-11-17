@@ -30,11 +30,11 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [X] Acceptanskriterier i formen Givet/När/Så
 - [X] Research (fil)
 - [X] Plan (fil)
-- [ ] Bygg med tester först
-- [ ] Granska (fil)
-- [ ] Verifiera (fil)
-- [ ] En ADR för det viktigaste beslutet
-- [ ] Små commits med spårbara meddelanden
+- [X] Bygg med tester först
+- [X] Granska (fil)
+- [X] Verifiera (fil)
+- [X] En ADR för det viktigaste beslutet
+- [X] Små commits med spårbara meddelanden
 
 ### Arbete 2: Granskning av kursledarens pull request
 - [ ] Minst en säkerhetsbrist
@@ -44,10 +44,10 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 
 ### Arbete 3: Modernisering av `src/legacy/price_calc.py`
 - [X] Codemap
-- [ ] Minst 5 karakteriseringstester
-- [ ] Refaktoreringssteg 1, gröna tester
-- [ ] Refaktoreringssteg 2, gröna tester
-- [ ] Refaktoreringssteg 3, gröna tester
+- [X] Minst 5 karakteriseringstester
+- [X] Refaktoreringssteg 1, gröna tester
+- [X] Refaktoreringssteg 2, gröna tester
+- [X] Refaktoreringssteg 3, gröna tester
 - [ ] Migreringsplan för databasen i reversibla steg
 
 ### Inlämning

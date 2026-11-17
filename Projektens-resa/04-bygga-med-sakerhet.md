@@ -197,6 +197,23 @@ och kursen kräver små steg. Planen för det (strangler fig) står i mall-svar.
 Att rätta O1 ändrar beteendet och kräver ett beslut och en ADR. En sak i taget.
 Nu ligger rabattregeln – och SQL-raden med `%` – på ett ställe, så steg 3 blir lättare.
 
+### Refaktoreringssteg 3: parametriserad SQL – commit `22a05e4`
+62. Alla tre SQL-frågor i `price_calc.py`: från `'%s'" % värde` (värdet byggs in i texten)
+    till `"%s", (värde,)` (värdet skickas separat). Samma regel som `$1` + `[värde]` i Node (SAL F4, fråga 5a).
+63. Bevis med en elak rabattkod `FINNS_INTE' OR '1'='1`:
+
+| Kod | Resultat |
+|-----|----------|
+| Gamla frågan | fick 10 % rabatt med en kod som inte finns – SQL injection |
+| Nya frågan | ingen rabatt – databasen ser texten som data |
+| Nya frågan med `VAR10` | 100 → 90, rabatten fungerar fortfarande |
+
+64. Kontroll: 5 karakteriseringstester gröna, 25 Jest-tester gröna, nattrapporten ger samma svar (O1 och O2 finns kvar).
+65. `(rabattkod,)` – kommatecknet gör det till en tupel med ett värde. Citattecknen runt `%s` togs bort, psycopg sätter dem själv.
+
+**Kvar:** `jobs/nightly_report.py:8` har samma mönster (`'%s'" % dag`). Mindre risk – `dag` kommer från den som kör jobbet,
+inte från en kund. Står under "en vecka till" i mall-svar.md.
+
 ### Problem 6: psycopg saknades igen, sedan fel port
 - Fel 1: `No module named 'psycopg'`. Orsak: `.venv` inte aktiverad. Lösning: `source .venv/bin/activate`.
 - Fel 2: `port 5432 failed: role "postgres" does not exist`. Orsak: filen läser `DATABASE_URL`, och utan `.env`
