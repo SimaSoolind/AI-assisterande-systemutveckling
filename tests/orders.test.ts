@@ -136,4 +136,23 @@ describe("POST /orders/:id/cancel", () => {
       expect(order.body.status).toBe(status);
     },
   );
+
+  it("returnerar 403 när beställningen tillhör en annan kund", async () => {
+    // Kund 1 skapar en ny beställning
+    const created = await request(app)
+      .post("/orders")
+      .set("X-Customer-Id", "1")
+      .send({ lines: [{ product: "Musmatta", quantity: 1, unitPrice: 200 }] });
+    const orderId: number = created.body.id;
+
+    // Kund 2 försöker avbryta kund 1:s beställning
+    const res = await request(app).post(`/orders/${orderId}/cancel`).set("X-Customer-Id", "2");
+
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe("forbidden");
+
+    // Statusen är fortfarande new
+    const order = await request(app).get(`/orders/${orderId}`).set("X-Customer-Id", "1");
+    expect(order.body.status).toBe("new");
+  });
 });
