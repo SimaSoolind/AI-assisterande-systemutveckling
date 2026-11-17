@@ -20,38 +20,38 @@ class Pris:
         self.total = total
 
 
-def _kapa(x):
+def _kapa(belopp):
     # två decimaler
-    return Decimal(int(x * 100)) / 100
+    return Decimal(int(belopp * 100)) / 100
 
 
 def calc_price(order_id):
     cur = conn.cursor()
     cur.execute("select discount_code from orders where id = %s" % order_id)
-    rad = cur.fetchone()
-    if rad == None:
+    orderrad = cur.fetchone()
+    if orderrad == None:
         return None
-    kod = rad[0]
+    rabattkod = orderrad[0]
 
     cur.execute("select quantity, unit_price from order_lines where order_id = %s" % order_id)
     summa = Decimal(0)
-    for q, p in cur.fetchall():
-        summa = summa + q * p
+    for antal, styckpris in cur.fetchall():
+        summa = summa + antal * styckpris
 
-    if kod:
-        cur.execute("select percent from discounts where code = '%s'" % kod)
-        r = cur.fetchone()
-        if r:
-            summa = summa - summa * r[0] / 100
+    if rabattkod:
+        cur.execute("select percent from discounts where code = '%s'" % rabattkod)
+        rabattrad = cur.fetchone()
+        if rabattrad:
+            summa = summa - summa * rabattrad[0] / 100
 
     net = _kapa(summa)
     vat = _kapa(net * MOMS / 100)
     total = net + vat
 
     try:
-        f = open(LOGG, "a")
-        f.write("%s %s %s\n" % (datetime.datetime.now().isoformat(), order_id, total))
-        f.close()
+        loggfil = open(LOGG, "a")
+        loggfil.write("%s %s %s\n" % (datetime.datetime.now().isoformat(), order_id, total))
+        loggfil.close()
     except:
         pass
 
@@ -59,8 +59,8 @@ def calc_price(order_id):
 
 
 if __name__ == "__main__":
-    p = calc_price(int(sys.argv[1]))
-    if p is None:
+    pris = calc_price(int(sys.argv[1]))
+    if pris is None:
         print(json.dumps({"error": "finns inte"}))
         sys.exit(1)
-    print(json.dumps({"net": str(p.net), "vat": str(p.vat), "total": str(p.total)}))
+    print(json.dumps({"net": str(pris.net), "vat": str(pris.vat), "total": str(pris.total)}))

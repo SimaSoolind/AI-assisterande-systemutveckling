@@ -17,7 +17,7 @@ Kriterier: docs/arbete-1/1-user-story.md · Research: docs/arbete-1/2-research.m
 - [X] npm run format:check visar 0 fel
 - [X] Tiden räknas i databasen med now()
 
-## Utanför (rör vi inte)
+## Utanför (rörs inte)
 - Avbryta betalda beställningar ('paid'): kräver återbetalning
 - price_calc.py (Arbete 3)
 - Ändringar i databasens tabeller: status och created_at finns redan
