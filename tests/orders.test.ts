@@ -163,4 +163,22 @@ describe("POST /orders/:id/cancel", () => {
     expect(res.status).toBe(404);
     expect(res.body.error.code).toBe("not_found");
   });
+
+  it("returnerar 401 utan inloggning", async () => {
+    // Kund 1 skapar en ny beställning
+    const created = await request(app)
+      .post("/orders")
+      .set("X-Customer-Id", "1")
+      .send({ lines: [{ product: "Musmatta", quantity: 1, unitPrice: 200 }] });
+    const orderId: number = created.body.id;
+
+    // Försök avbryta utan X-Customer-Id (inte inloggad)
+    const res = await request(app).post(`/orders/${orderId}/cancel`);
+
+    expect(res.status).toBe(401);
+
+    // Statusen är fortfarande new
+    const order = await request(app).get(`/orders/${orderId}`).set("X-Customer-Id", "1");
+    expect(order.body.status).toBe("new");
+  });
 });
