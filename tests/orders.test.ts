@@ -1,5 +1,6 @@
 import request from "supertest";
 import { createApp } from "../src/app";
+import { db } from "../src/db";
 import { closeDb, resetDb } from "./helpers/db";
 
 const app = createApp();
@@ -84,5 +85,29 @@ describe("POST /orders/:id/cancel", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.status).toBe("cancelled");
+  });
+
+  it("returnerar 409 när beställningen är lagd för mer än 30 minuter sedan", async () => {
+    // Skapa en ny beställning med status new
+    const created = await request(app)
+      .post("/orders")
+      .set("X-Customer-Id", "1")
+      .send({ lines: [{ product: "Musmatta", quantity: 1, unitPrice: 200 }] });
+    const orderId: number = created.body.id;
+
+    // Flytta tiden bakåt: beställningen lades för 31 minuter sedan
+    await db.query("UPDATE orders SET created_at = now() - interval '31 minutes' WHERE id = $1", [
+      orderId,
+    ]);
+
+    // Försök avbryta beställningen
+    const res = await request(app).post(`/orders/${orderId}/cancel`).set("X-Customer-Id", "1");
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe("conflict");
+
+    // Statusen är fortfarande new
+    const order = await request(app).get(`/orders/${orderId}`).set("X-Customer-Id", "1");
+    expect(order.body.status).toBe("new");
   });
 });
