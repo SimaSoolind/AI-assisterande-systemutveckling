@@ -24,6 +24,19 @@ Riggen är allt som styr agenten. Den ligger i repot, så att den fungerar likad
 12. `stoppa-hemligheter` (PreToolUse) – stoppar ändring i `.env` och nycklar i koden.
 13. Testade varje hook med egen indata: `echo '{...}' | node .claude/hooks/x.mjs; echo $?`
 
+### ESLint med säkerhetsregler och egen regel (måndag 17/nov) – commit `d7fffeb`
+SAL säger: ett fel som hittas tidigt är billigast att rätta (shift-left).
+14. `npm install -D eslint-plugin-security` – gratis paket (SAST, SAL F4). `-D` = bara för utveckling.
+15. Egen regel ur docs/standard.md i `eslint.config.js`: SQL byggs aldrig med `${}`.
+    Felmeddelandet säger hur felet rättas: "Använd $1 och skicka värdet i en lista: db.query(sql, [värde])."
+16. Testade regeln med en tillfällig fil: SQL med `${id}` → error. SQL med `$1` → inget fel. Filen raderad.
+17. `npm run lint`: 0 fel, 2 varningar (`readFileSync` med variabel i tests/helpers/db.ts – testkod, ofarligt).
+    Enligt min regel: nya varningar får vara varningar först.
+18. Hooken format-och-kontroll kör eslint efter varje ändring, så regeln stoppar agenten direkt (exit 2).
+
+**Varför billigare:** paketet kör på millisekunder och kostar 0 kr. Opus-agenten kostar tokens.
+Därför: gratis kontroller först, dyr AI-granskning sist (granskning i lager).
+
 ### Problem 1: Hooken kraschade på texten null
 - Fel: `TypeError: Cannot read properties of null (reading 'tool_input')`.
 - Orsak: `JSON.parse("null")` är giltigt, men ger inget objekt.
@@ -121,6 +134,24 @@ så när jag committade följde steg 3 med. Commiten var redan pushad, så jag s
 - Orsak: `git add .` tar med allt, även `docs/rigg-mall.md`.
 - Lösning: `git rm --cached docs/rigg-mall.md` + rad i `.gitignore`. Commit `9a60e1e`.
 - Lärdom: skriv filnamnen i `git add`, inte bara en punkt.
+
+## Del C: Arbete 3 – Modernisering av price_calc.py (måndag 17/nov)
+Regeln: förstå först, lås fast beteendet med tester, ändra sedan i små steg.
+
+### Steg 1: Analys – `docs/analys-price-calc.md`
+39. Sökte efter alla anrop: filen används på **två** ställen – API:t (`src/pricing/legacyPrice.ts`) och nattrapporten (`jobs/nightly_report.py`).
+40. Sidoeffekter: öppnar databasen redan när filen laddas, och skriver fel tyst till en loggfil.
+41. Tre osäkerheter: **O1** utgången rabatt (1045), **O2** momsen kapas (1044), **O3** beställning utan rader (1043).
+42. Säkerhet: SQL injection på rad 42 – rabattkoden från kunden byggs in med `%` (SAL F4). Noterat, inte rättat än.
+
+### Steg 3: Körning – vad koden svarar i dag
+43. `npm run db:reset` och sedan `python3 src/legacy/price_calc.py` för 1040–1047. Tabellen står i analysfilen, avsnitt 7.
+44. Det blev **inte** facit: 1044 och 1045 har buggar. Det är vad koden gör i dag, och testerna ska låsa fast just det.
+
+### Problem 6: psycopg saknades igen, sedan fel port
+- Fel 1: `No module named 'psycopg'`. Orsak: `.venv` inte aktiverad. Lösning: `source .venv/bin/activate`.
+- Fel 2: `port 5432 failed: role "postgres" does not exist`. Orsak: filen läser `DATABASE_URL`, och utan `.env`
+  används reservadressen i koden (fynd B4). Lösning: `set -a; source .env; set +a` – laddar `.env` utan att visa den.
 
 ## Säkerhet i det jag byggde (SAL)
 | Fråga | Hur |

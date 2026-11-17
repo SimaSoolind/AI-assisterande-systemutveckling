@@ -9,7 +9,7 @@ Kriterier: docs/arbete-1/1-user-story.md · Research: docs/arbete-1/2-research.m
 - [x] Steg 3: Redan avbruten eller skickad → 409 (fall 3 och 8)
 - [X] Steg 4: Någon annans → 403, finns inte → 404 (fall 4 och 7)
 - [X] Steg 5: Inte inloggad → 401, id inte ett tal → 400 (fall 5 och 6)
-- [] Steg 6: ADR om att tiden räknas i databasen (docs/adr/)
+- [X] Steg 6: ADR om att tiden räknas i databasen (docs/adr/)
 
 ## Klart när
 - [X] Alla 8 fall har ett test, och alla tester är gröna (npm test)
