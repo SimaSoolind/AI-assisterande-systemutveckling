@@ -48,6 +48,8 @@ Kund 2 fick 403, men hann ändå avbryta kund 1:s beställning.
 - Ett test ska vara rött först. Annars vet jag inte om det fångar något.
 - Kolla inte bara svaret. Kolla också **datan**: ändrades något som inte skulle ändras?
 - Mutationstest = förstör koden med flit en kort stund och se att testet larmar. Som testknappen på ett brandlarm.
+- Ett namnbyte är ett säkert steg (liten risk): ett namn ändrar inte vad koden gör, utan bara vad sakerna heter.
+  Det visades av karakteriseringstesterna, som gav exakt samma svar före och efter. Det är därför testerna görs först.
 
 ### Med mina egna ord
 - Jag bevisade att mitt test fångar en säkerhetsbrist genom att ta bort skyddet en kort stund.

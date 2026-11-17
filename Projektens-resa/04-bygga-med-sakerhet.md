@@ -172,6 +172,19 @@ Regeln: förstå först, lås fast beteendet med tester, ändra sedan i små ste
 
 **Att komma ihåg:** Jest och pytest delar testdatabasen. Kör dem efter varandra, inte samtidigt.
 
+### Refaktoreringssteg 1: tydliga namn – commit `b2f37ec`
+54. Bytte otydliga namn i `price_calc.py` till svenska namn som säger vad de är:
+    `x` → `belopp`, `rad` → `orderrad`, `kod` → `rabattkod`, `q, p` → `antal, styckpris`, `r` → `rabattrad`, `f` → `loggfil`.
+55. Rörde inte `calc_price`, `conn`, `Pris` och `.net/.vat/.total` – nattrapporten och testerna använder dem.
+56. Kontroll: 5 karakteriseringstester gröna, 25 Jest-tester gröna, och nattrapporten (väg 2) ger samma svar.
+57. Valde svenska namn: filen är redan på svenska (`summa`, `Pris`, `MOMS`). Engelska hade blandat språk i filen.
+
+**Varför ett säkert första steg?** Ett namnbyte ändrar inte vad koden gör, bara vad sakerna heter.
+Karakteriseringstesterna gav exakt samma svar före och efter – därför skrevs testerna först.
+
+**Övervägde men valde bort:** skriva om Python till TypeScript nu. Nattrapporten importerar Python-filen,
+och kursen kräver små steg. Planen för det (strangler fig) står i mall-svar.md under "en vecka till".
+
 ### Problem 6: psycopg saknades igen, sedan fel port
 - Fel 1: `No module named 'psycopg'`. Orsak: `.venv` inte aktiverad. Lösning: `source .venv/bin/activate`.
 - Fel 2: `port 5432 failed: role "postgres" does not exist`. Orsak: filen läser `DATABASE_URL`, och utan `.env`
