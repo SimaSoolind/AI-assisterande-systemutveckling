@@ -89,11 +89,13 @@ export const cancelOrder = async (orderId: number, customerId: number): Promise<
   if (!order.ok) return order;
 
   // Ändra status bara om beställningen är ny och yngre än 30 minuter.
-  // Databasen räknar tiden med now(). Värdena skickas som $1 (SAL F4)
+  // Databasen räknar tiden med now(). Värdena skickas som $1 och $2 (SAL F4)
+  // customer_id i WHERE: bara kundens egen rad kan ändras (SAL F2, försvar på djupet)
   const updated = await db.query(
     `UPDATE orders SET status = 'cancelled'
-       WHERE id = $1 AND status = 'new' AND created_at > now() - interval '30 minutes'`,
-    [orderId],
+       WHERE id = $1 AND customer_id = $2 AND status = 'new'
+         AND created_at > now() - interval '30 minutes'`,
+    [orderId, customerId],
   );
 
   // Ingen rad ändrades: fel status eller tiden har gått ut (409)
