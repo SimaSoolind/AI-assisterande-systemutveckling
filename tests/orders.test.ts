@@ -181,4 +181,12 @@ describe("POST /orders/:id/cancel", () => {
     const order = await request(app).get(`/orders/${orderId}`).set("X-Customer-Id", "1");
     expect(order.body.status).toBe("new");
   });
+
+  it("returnerar 400 när id inte är ett tal", async () => {
+    // "banan" är inget giltigt id
+    const res = await request(app).post("/orders/banan/cancel").set("X-Customer-Id", "1");
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe("invalid_input");
+  });
 });
