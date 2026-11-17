@@ -155,4 +155,12 @@ describe("POST /orders/:id/cancel", () => {
     const order = await request(app).get(`/orders/${orderId}`).set("X-Customer-Id", "1");
     expect(order.body.status).toBe("new");
   });
+
+  it("returnerar 404 när beställningen inte finns", async () => {
+    // Beställning 9999 finns inte i testdatan
+    const res = await request(app).post("/orders/9999/cancel").set("X-Customer-Id", "1");
+
+    expect(res.status).toBe(404);
+    expect(res.body.error.code).toBe("not_found");
+  });
 });
