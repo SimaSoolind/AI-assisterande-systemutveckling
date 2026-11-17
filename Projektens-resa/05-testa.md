@@ -50,6 +50,8 @@ Kund 2 fick 403, men hann ändå avbryta kund 1:s beställning.
 - Mutationstest = förstör koden med flit en kort stund och se att testet larmar. Som testknappen på ett brandlarm.
 - Ett namnbyte är ett säkert steg (liten risk): ett namn ändrar inte vad koden gör, utan bara vad sakerna heter.
   Det visades av karakteriseringstesterna, som gav exakt samma svar före och efter. Det är därför testerna görs först.
+- En plan som bara är skriven är en gissning. Först när migreringsplanen provkördes syntes att backstegen
+  beror på varandra: regeln måste tas bort innan gamla data kan läggas tillbaka. Ångra i omvänd ordning.
 
 ### Med mina egna ord
 - Jag bevisade att mitt test fångar en säkerhetsbrist genom att ta bort skyddet en kort stund.

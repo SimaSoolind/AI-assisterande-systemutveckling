@@ -214,6 +214,31 @@ Nu ligger rabattregeln – och SQL-raden med `%` – på ett ställe, så steg 3
 **Kvar:** `jobs/nightly_report.py:8` har samma mönster (`'%s'" % dag`). Mindre risk – `dag` kommer från den som kör jobbet,
 inte från en kund. Står under "en vecka till" i mall-svar.md.
 
+### Migreringsplan – `docs/migreringsplan.md` – committas med resan
+66. Problemet: databasen tillåter vilken status som helst. Ett stavfel som `'canceled'` sparas tyst,
+    och då hittar `cancelOrder` (`status = 'new'`) och nattrapporten (`status = 'paid'`) inte raden.
+67. Lösningen: en CHECK-regel – bara `new`, `paid`, `shipped`, `cancelled` – införd i expand/contract-steg:
+
+| Steg | Gör | Går att backa? |
+|------|-----|----------------|
+| 1 Expand | regeln med `NOT VALID` – gäller nya rader direkt | ✅ `DROP CONSTRAINT` |
+| 2 Verifiera | leta efter gamla rader med okänd status | ✅ bara läsning |
+| 3 Rätta gamla rader (om de finns) | kopia + `UPDATE` | ⚠️ bara med kopian – och först efter att regeln är borttagen |
+| 4 Contract | `VALIDATE CONSTRAINT` – gäller alla rader | ✅ `DROP CONSTRAINT` |
+| 5 Städa | regeln in i `schema.sql`, kopian bort | kopian går inte att få tillbaka |
+
+68. Provkörd i testdatabasen inuti `BEGIN … ROLLBACK`: 0 rader med okänd status, `VALIDATE` gav `true`,
+    och ett stavfel (`'canceled'`) stoppades av regeln. Allt ångrades – databasen är oförändrad.
+69. **Provkörningen hittade ett fel i planen:** att backa steg 3 (lägga tillbaka från kopian) gick inte,
+    för regeln från steg 1 vägrade släppa in det gamla värdet. Rättat: backa i rätt ordning –
+    först ta bort regeln, sedan återställa från kopian. Provkört igen: fungerade.
+
+**Varför inte allt på en gång?** En vanlig CHECK kontrollerar alla gamla rader direkt. Finns en enda felaktig rad
+misslyckas allt, och tabellen kan låsas länge. Stegvis är säkrare, och varje steg kan backas.
+
+## Arbete 3 är klart ✅
+Codemap, 5 karakteriseringstester, tre refaktoreringssteg med grönt efter varje, och en migreringsplan.
+
 ### Problem 6: psycopg saknades igen, sedan fel port
 - Fel 1: `No module named 'psycopg'`. Orsak: `.venv` inte aktiverad. Lösning: `source .venv/bin/activate`.
 - Fel 2: `port 5432 failed: role "postgres" does not exist`. Orsak: filen läser `DATABASE_URL`, och utan `.env`
