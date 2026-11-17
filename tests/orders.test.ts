@@ -110,4 +110,30 @@ describe("POST /orders/:id/cancel", () => {
     const order = await request(app).get(`/orders/${orderId}`).set("X-Customer-Id", "1");
     expect(order.body.status).toBe("new");
   });
+
+  // Samma test körs två gånger: en gång för varje status
+  it.each(["cancelled", "shipped"])(
+    "returnerar 409 när beställningen redan har status %s",
+    async (status) => {
+      // Skapa en ny beställning, lagd nyss
+      const created = await request(app)
+        .post("/orders")
+        .set("X-Customer-Id", "1")
+        .send({ lines: [{ product: "Musmatta", quantity: 1, unitPrice: 200 }] });
+      const orderId: number = created.body.id;
+
+      // Ge beställningen statusen som testet gäller
+      await db.query("UPDATE orders SET status = $1 WHERE id = $2", [status, orderId]);
+
+      // Försök avbryta beställningen
+      const res = await request(app).post(`/orders/${orderId}/cancel`).set("X-Customer-Id", "1");
+
+      expect(res.status).toBe(409);
+      expect(res.body.error.code).toBe("conflict");
+
+      // Statusen är oförändrad
+      const order = await request(app).get(`/orders/${orderId}`).set("X-Customer-Id", "1");
+      expect(order.body.status).toBe(status);
+    },
+  );
 });
