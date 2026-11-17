@@ -25,6 +25,17 @@ def _kapa(belopp):
     return Decimal(int(belopp * 100)) / 100
 
 
+def _dra_av_rabatt(cur, rabattkod, summa):
+    # drar av rabattkodens procent från summan.
+    # OBS giltighetsdatumet kontrolleras inte (O1, se docs/analys-price-calc.md)
+    if rabattkod:
+        cur.execute("select percent from discounts where code = '%s'" % rabattkod)
+        rabattrad = cur.fetchone()
+        if rabattrad:
+            summa = summa - summa * rabattrad[0] / 100
+    return summa
+
+
 def calc_price(order_id):
     cur = conn.cursor()
     cur.execute("select discount_code from orders where id = %s" % order_id)
@@ -38,11 +49,7 @@ def calc_price(order_id):
     for antal, styckpris in cur.fetchall():
         summa = summa + antal * styckpris
 
-    if rabattkod:
-        cur.execute("select percent from discounts where code = '%s'" % rabattkod)
-        rabattrad = cur.fetchone()
-        if rabattrad:
-            summa = summa - summa * rabattrad[0] / 100
+    summa = _dra_av_rabatt(cur, rabattkod, summa)
 
     net = _kapa(summa)
     vat = _kapa(net * MOMS / 100)
