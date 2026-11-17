@@ -43,7 +43,7 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [ ] Vilken kontroll i riggen som hade stoppat varje brist
 
 ### Arbete 3: Modernisering av `src/legacy/price_calc.py`
-- [ ] Codemap
+- [X] Codemap
 - [ ] Minst 5 karakteriseringstester
 - [ ] Refaktoreringssteg 1, gröna tester
 - [ ] Refaktoreringssteg 2, gröna tester

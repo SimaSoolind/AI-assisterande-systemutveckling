@@ -138,15 +138,39 @@ så när jag committade följde steg 3 med. Commiten var redan pushad, så jag s
 ## Del C: Arbete 3 – Modernisering av price_calc.py (måndag 17/nov)
 Regeln: förstå först, lås fast beteendet med tester, ändra sedan i små steg.
 
-### Steg 1: Analys – `docs/analys-price-calc.md`
+### Steg 1: Analys – `docs/analys-price-calc.md` – commit `748e015`
 39. Sökte efter alla anrop: filen används på **två** ställen – API:t (`src/pricing/legacyPrice.ts`) och nattrapporten (`jobs/nightly_report.py`).
 40. Sidoeffekter: öppnar databasen redan när filen laddas, och skriver fel tyst till en loggfil.
 41. Tre osäkerheter: **O1** utgången rabatt (1045), **O2** momsen kapas (1044), **O3** beställning utan rader (1043).
 42. Säkerhet: SQL injection på rad 42 – rabattkoden från kunden byggs in med `%` (SAL F4). Noterat, inte rättat än.
 
-### Steg 3: Körning – vad koden svarar i dag
+### Steg 2: Codemap – `docs/codemap.md` – committas med resan
+51. En rad per fil i `src/`, `jobs/`, `scripts/` och `db/`: vad den gör och vad den anropar.
+52. Två vägar in till `price_calc.py`, kontrollerade mot koden:
+
+| | Väg 1: API | Väg 2: nattrapporten |
+|---|------------|----------------------|
+| Var | `src/pricing/legacyPrice.ts:7` | `jobs/nightly_report.py:4` |
+| Hur | startar Python som egen process | `from price_calc import calc_price, conn` |
+| Behörighet | `requireCustomer` + `getOrder` | ingen (körs av cron) |
+
+53. Följd för refaktoreringen: rör inte namnen `calc_price` och `conn`. Då går nattrapporten sönder,
+    och karakteriseringstesterna märker det inte – de testar bara `calc_price`.
+
+### Steg 3: Körning – vad koden svarar i dag – commit `748e015`
 43. `npm run db:reset` och sedan `python3 src/legacy/price_calc.py` för 1040–1047. Tabellen står i analysfilen, avsnitt 7.
 44. Det blev **inte** facit: 1044 och 1045 har buggar. Det är vad koden gör i dag, och testerna ska låsa fast just det.
+
+### Steg 4: Fem karakteriseringstester – `tests/test_price_calc.py` – commit `d625203`
+45. Ett test per beställning: 1042 (grundfall), 1043 (O3), 1044 (O2), 1045 (O1), 1041 (giltig rabatt).
+46. Alla gröna mot den **orörda** filen. Testerna låser fast vad koden gör i dag, även buggarna.
+47. Test 1 jämför med `str(...)`: `Decimal("1187.5") == Decimal("1187.50")` är sant, så bara `str` märker formen `"1187.5"`.
+48. `tests/conftest.py` sätter testdatabasen **före** importen (som `env.ts` för Jest).
+    Förut fungerade testerna bara om jag satte `DATABASE_URL` själv. Nu räcker `npm run test:legacy`.
+49. Agenten försökte läsa `.env` och nekades – deny-regeln i `settings.json` fungerade (SAL F3).
+50. Lösenordet `postgres` i conftest är den lokala testdatabasens, samma som i `env.ts`. Riktiga hemligheter ligger i `.env`.
+
+**Att komma ihåg:** Jest och pytest delar testdatabasen. Kör dem efter varandra, inte samtidigt.
 
 ### Problem 6: psycopg saknades igen, sedan fel port
 - Fel 1: `No module named 'psycopg'`. Orsak: `.venv` inte aktiverad. Lösning: `source .venv/bin/activate`.
