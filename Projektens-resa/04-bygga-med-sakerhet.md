@@ -185,6 +185,18 @@ Karakteriseringstesterna gav exakt samma svar före och efter – därför skrev
 **Övervägde men valde bort:** skriva om Python till TypeScript nu. Nattrapporten importerar Python-filen,
 och kursen kräver små steg. Planen för det (strangler fig) står i mall-svar.md under "en vecka till".
 
+### Refaktoreringssteg 2: rabatten i en egen funktion – commit `63ee45a`
+58. Flyttade rabattberäkningen från `calc_price` till en egen funktion `_dra_av_rabatt(cur, rabattkod, summa)`.
+    I `calc_price` står nu en rad i stället för fem.
+59. Exakt samma kod flyttad. `_` först i namnet betyder "intern" i Python – nattrapporten ska inte använda den.
+60. Kommentaren `OBS giltighetsdatumet kontrolleras inte (O1)` – buggen är dokumenterad, inte rättad.
+61. Kontroll: 5 karakteriseringstester gröna (även 1045 med utgången rabatt), 25 Jest-tester gröna,
+    nattrapporten 2026-10-07 ger 689.56 kr – samma som förut.
+
+**Varför rättas inte O1 nu?** Refaktorering ändrar hur koden ser ut, inte vad den gör.
+Att rätta O1 ändrar beteendet och kräver ett beslut och en ADR. En sak i taget.
+Nu ligger rabattregeln – och SQL-raden med `%` – på ett ställe, så steg 3 blir lättare.
+
 ### Problem 6: psycopg saknades igen, sedan fel port
 - Fel 1: `No module named 'psycopg'`. Orsak: `.venv` inte aktiverad. Lösning: `source .venv/bin/activate`.
 - Fel 2: `port 5432 failed: role "postgres" does not exist`. Orsak: filen läser `DATABASE_URL`, och utan `.env`
