@@ -16,8 +16,8 @@ Jag skriver vad jag lärde mig.
 | `sessions/pass-2.md` | Arbete 1 och 3, med bevis och förbrukning, 17 nov | `e9411ba` |
 
 ## Lämna in
-- [ ] Mallen ifylld (`docs/mall-svar.md`) och sparad som PDF
-- [ ] Karta i README: var läraren hittar vad
+- [x] Mallen ifylld (`docs/mall-svar.md`) och sparad som PDF
+- [x] Karta i README: var läraren och LIA hittar vad
 - [ ] `git tag inlamning` och `git push --tags`
 - [ ] Länken till repot på Learnpoint
 - [ ] Arbete 2: lärarens pull request på seminariet
