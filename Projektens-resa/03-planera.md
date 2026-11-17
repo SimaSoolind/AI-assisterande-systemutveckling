@@ -1,6 +1,13 @@
 # Steg 3: Planera
 Välj vad jag ska bygga eller rätta. Dela upp det i små steg. Skriv vad som ska vara klart när jag är färdig.
 
+## Arbete 1: Avbryta en beställning (17/nov) ✅ planerad
+- User story och 8 acceptanskriterier: `docs/arbete-1/1-user-story.md`
+- Research: `docs/arbete-1/2-research.md`
+- Plan med steg, Klart när och Utanför: `docs/plan.md`
+- Beslut: tiden räknas i databasen med `now()`, och status + tid kollas i samma UPDATE. Blir ADR 001.
+- Beslut: bara status 'new' kan avbrytas. 'paid' kräver återbetalning och är utanför.
+
 ## Idéer att planera (från riskbedömningen)
 
 ### Gemensam felhanterare (risk 🟡 i 02-riskbedomning.md)
