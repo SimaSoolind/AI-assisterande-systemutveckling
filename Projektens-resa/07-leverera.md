@@ -24,14 +24,4 @@ Jag skriver vad jag lärde mig.
 - [ ] Redovisning 19 nov
 
 ## Vad jag lärde mig
-- **Riggen arbetar åt mig:** hooks stoppar fel automatiskt, och jag behöver inte komma ihåg varje kontroll.
-- **Granskning i lager:** gratis verktyg först (lint, typer, tester), dyr AI-granskning sist.
-  Automatiken hittade 0 fel, men säkerhetsagenten hittade att ett för stort id fick anropet att hänga.
-- **Jag kan inte lita blint på testerna:** ett test som aldrig har varit rött kan vara trasigt. Mutationstest bevisar det.
-- **Kolla datan, inte bara svaret:** servern svarade 403, men hade redan ändrat beställningen.
-- **Förstå först, ändra sedan:** analys, codemap och karakteriseringstester innan den gamla koden ändrades.
-- **En plan som bara är skriven är en gissning:** migreringsplanen hade ett fel som bara syntes när den provkördes.
-- **Säkerhet från första raden:** `$1` i Node och `%s` med tupel i Python är samma regel (SAL F4).
-- **Gå igenom dokumentationen själv:** när jag läste resan fil för fil hittade jag det som var otydligt,
-  svårläst eller saknades – till exempel att två agenter aldrig hade använts. Då kunde jag rätta det.
-- **Kostnad:** över 98 % av alla tokens var cache-läsning. Planen i en fil och en ny chatt per arbete håller kostnaden nere.
+Alla mina lärdomar står samlade i [08-vad-jag-har-lart-mig.md](08-vad-jag-har-lart-mig.md) – under Steg 7.

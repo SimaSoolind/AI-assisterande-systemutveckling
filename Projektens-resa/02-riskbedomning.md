@@ -108,5 +108,4 @@ För varje risk svarar jag på tre frågor: vad kan gå fel, hur illa blir det, 
 ---
 
 ## Lärdom
-Jag hittade risk 2 när jag studerade koden. Sedan bevisade jag den med ett test.
-Det är hela SAL-livscykeln: hitta → bevisa → dokumentera.
+Alla mina lärdomar står samlade i [08-vad-jag-har-lart-mig.md](08-vad-jag-har-lart-mig.md) – under Steg 2.

@@ -47,9 +47,7 @@ Steg 1: Studera koden (pågår)datum tisdag 10/nov
     Svar: `{"net":"950","vat":"237.5","total":"1187.5"}` ✅
 
 ### Lärdomar
-- Terminalen med `npm start` är upptagen. Kör curl i en andra terminal.
-- Stoppa servern med `Ctrl + C`.
-- Öppna en fil med `code filnamn`, inte bara filnamnet.
+Alla mina lärdomar står samlade i [08-vad-jag-har-lart-mig.md](08-vad-jag-har-lart-mig.md) – under Steg 1.
 
 ### Fynd att ta med i steg 3 (riskbedömning)
 - `npm install` visade 15 sårbarheter (1 hög).

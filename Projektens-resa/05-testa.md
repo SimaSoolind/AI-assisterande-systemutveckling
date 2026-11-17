@@ -14,7 +14,7 @@ Jag kör alla tester, så att inget gammalt har gått sönder.
 Ett hängande anrop är värre än 500: klienten får inget svar, och många sådana anrop kan fylla servern (DoS, SAL F5).
 `parseId` är alltså inte bara snyggt – den skyddar SQL mot ogiltig indata (SAL F4, fråga 5b).
 
-## Mutationstest: bevisa att testet fångar en säkerhetsbrist (måndag 17/nov)
+## Mutationstest: bevisa att testet fångar en säkerhetsbrist (tisdag 17/nov)
 
 ### Bakgrund
 Testet för fall 4 (kund 2 försöker avbryta kund 1:s beställning → 403) blev **grönt direkt**.
@@ -46,13 +46,7 @@ Kund 2 fick 403, men hann ändå avbryta kund 1:s beställning.
 - OWASP Top 10, nr 1: **Broken Access Control**.
 
 ### Lärdomar
-- Ett test ska vara rött först. Annars vet jag inte om det fångar något.
-- Kolla inte bara svaret. Kolla också **datan**: ändrades något som inte skulle ändras?
-- Mutationstest = förstör koden med flit en kort stund och se att testet larmar. Som testknappen på ett brandlarm.
-- Ett namnbyte är ett säkert steg (liten risk): ett namn ändrar inte vad koden gör, utan bara vad sakerna heter.
-  Det visades av karakteriseringstesterna, som gav exakt samma svar före och efter. Det är därför testerna görs först.
-- En plan som bara är skriven är en gissning. Först när migreringsplanen provkördes syntes att backstegen
-  beror på varandra: regeln måste tas bort innan gamla data kan läggas tillbaka. Ångra i omvänd ordning.
+Alla mina lärdomar står samlade i [08-vad-jag-har-lart-mig.md](08-vad-jag-har-lart-mig.md) – under Steg 5.
 
 ### Med mina egna ord
 - Jag bevisade att mitt test fångar en säkerhetsbrist genom att ta bort skyddet en kort stund.

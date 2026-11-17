@@ -2,7 +2,7 @@
 **Regler – så här gör jag:** Jag kontrollerar att jag har byggt rätt sak. Stämmer det med planen och kraven?
 Jag kör lint och typecheck.
 
-## Arbete 1: Klart när i docs/plan.md (måndag 17/nov)
+## Arbete 1: Klart när i docs/plan.md (tisdag 17/nov)
 | Klart när | Kommando | Resultat |
 |-----------|----------|----------|
 | Alla 8 fall har ett test, alla gröna | `npm test` (med `.venv` aktiverad) | ✅ 24 av 24 tester (25 efter S2), 2 av 2 testfiler |
@@ -28,7 +28,7 @@ Alla 8 acceptanskriterier i `docs/arbete-1/1-user-story.md` har ett test.
 - API-kontraktet: `POST /orders/:id/cancel` med 200, 400, 401, 403, 404, 409 i `docs/api.md` – commit `e15a3b8`.
 - tsconfig: `node16` + `isolatedModules`, så att VS Code (TS 6) och ts-jest inte varnar – commit `2367015`.
 
-## Granskning i lager (måndag 17/nov) – commit `3e153d9`
+## Granskning i lager (tisdag 17/nov) – commit `3e153d9`
 Billigast först (AI D2-F5): automatik → agenter → jag beslutar. Hela granskningen: `docs/arbete-1/3-granskning.md`.
 
 | Lager | Hittade |
@@ -52,7 +52,7 @@ Billigast först (AI D2-F5): automatik → agenter → jag beslutar. Hela gransk
 
 Efter rättningarna: 25 av 25 tester gröna, lint, typecheck och format 0 fel.
 
-## Verifiering mot den riktiga servern (måndag 17/nov)
+## Verifiering mot den riktiga servern (tisdag 17/nov)
 Startade `npm start` och testade alla 8 fall med curl. Kommandon och svar: `docs/arbete-1/4-verifiering.md`.
 
 | Fall | Svar |
@@ -77,7 +77,7 @@ Det automatiska testet (`it.each`) visar `shipped` ensamt.
 Alla rutor i checklistan: user story, acceptanskriterier, research, plan, bygg med tester först,
 granska, verifiera, ADR och små commits.
 
-## Slutkontroll av hela projektet (måndag 17/nov)
+## Slutkontroll av hela projektet (tisdag 17/nov)
 | Kontroll | Verktyg | Typ | Resultat |
 |----------|---------|-----|----------|
 | 25 API-tester | Jest + supertest | test | ✅ 25 av 25 |

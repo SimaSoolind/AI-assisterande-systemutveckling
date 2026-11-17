@@ -387,11 +387,4 @@ Codemap, 5 karakteriseringstester, tre refaktoreringssteg med grönt efter varje
 | 5e Fel | `sendError` ger `{ error: { code, message } }`, inga interna detaljer |
 
 ## Lärdomar
-- Middleware säger ja med `next()` utan svar, eller nej med 401. En förfrågan får bara ett svar.
-- 403 = jag vet vem du är, men du får inte. Gäller både fel roll och någon annans rad.
-- Ett kriterium = en orsak. Därför "10 minuter" i alla fall utom tidsfallet.
-- Testet kontrollerar. Koden gör jobbet. TDD: först rött, sedan grönt.
-- Det svåraste var att skriva user storyn och att tolka koden.
-  Jag har inte gått igenom alla delar än, och hittills kan jag bara sätta upp ett API.
-- Det som hjälpte: tester, lint och typkontroll kontrollerade koden åt mig.
-  Jag granskade block för block: vad gör varje del, och vilket kriterium löser den?
+Alla mina lärdomar står samlade i [08-vad-jag-har-lart-mig.md](08-vad-jag-har-lart-mig.md) – under Steg 4.
