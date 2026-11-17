@@ -10,15 +10,15 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [X] Kodstandard som kontrolleras automatiskt: linter
 - [X] Kodstandard som kontrolleras automatiskt: formatering
 - [X] Kodstandard som kontrolleras automatiskt: typkontroll
-- [ ] Felmeddelandena säger hur felet rättas
+- [X] Felmeddelandena säger hur felet rättas
 - [X] Skill 1: `/tdd`
-- [ ] Skill 2:
-- [ ] Skill 3:
+- [X] Skill 2: /codemap
+- [X] Skill 3:/logg
 - [X] Subagent 1 (beskrivning, verktyg, modell)
 - [X] Subagent 2
 - [X] Subagent 3
 - [X] Subagent 4
-- [ ] Hook 1: minneskedjan sparar sessionens läge
+- [X] Hook 1: minneskedjan sparar sessionens läge
 - [X] Hook 2: minneskedjan laddar sessionens läge
 - [X] Hook 3: stoppar att tester tas bort eller stängs av
 - [X] Hook 4:format-och-kontroll
@@ -26,10 +26,10 @@ AI-assisterad systemutveckling · individuellt · riggen i repot, dokumentation 
 - [ ] Sessionslogg efter varje arbetspass i `sessions/`
 
 ### Arbete 1: Ny funktion
-- [ ] Välj user story
-- [ ] Acceptanskriterier i formen Givet/När/Så
-- [ ] Research (fil)
-- [ ] Plan (fil)
+- [X] Välj user story
+- [X] Acceptanskriterier i formen Givet/När/Så
+- [X] Research (fil)
+- [X] Plan (fil)
 - [ ] Bygg med tester först
 - [ ] Granska (fil)
 - [ ] Verifiera (fil)
