@@ -29,7 +29,7 @@ def _dra_av_rabatt(cur, rabattkod, summa):
     # drar av rabattkodens procent från summan.
     # OBS giltighetsdatumet kontrolleras inte (O1, se docs/analys-price-calc.md)
     if rabattkod:
-        cur.execute("select percent from discounts where code = '%s'" % rabattkod)
+        cur.execute("select percent from discounts where code = %s", (rabattkod,))
         rabattrad = cur.fetchone()
         if rabattrad:
             summa = summa - summa * rabattrad[0] / 100
@@ -38,13 +38,13 @@ def _dra_av_rabatt(cur, rabattkod, summa):
 
 def calc_price(order_id):
     cur = conn.cursor()
-    cur.execute("select discount_code from orders where id = %s" % order_id)
+    cur.execute("select discount_code from orders where id = %s", (order_id,))
     orderrad = cur.fetchone()
     if orderrad == None:
         return None
     rabattkod = orderrad[0]
 
-    cur.execute("select quantity, unit_price from order_lines where order_id = %s" % order_id)
+    cur.execute("select quantity, unit_price from order_lines where order_id = %s", (order_id,))
     summa = Decimal(0)
     for antal, styckpris in cur.fetchall():
         summa = summa + antal * styckpris
