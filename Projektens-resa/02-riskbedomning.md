@@ -10,3 +10,4 @@ Leta efter fel och säkerhetsrisker. Märk varje risk som hög 🔴, medel 🟡 
   **Bevisad 17/nov:** utan `parseId` kraschade SQL på `NaN`, och anropet hängde utan svar (se 05-testa.md).
   Risk för DoS: många hängande anrop kan fylla servern. Höjd till 🔴 hög.
 - 🟢 403 avslöjar att en beställning finns, även om den är någon annans (src/services/orderService.ts). Lösning: svara 404 i stället, så att en angripare inte kan se vilka id:n som finns.
+- Jag hittade risken när jag studerade koden. Sedan bevisade jag den med ett test. Det är hela SAL-livscykeln: hitta → bevisa → dokumentera.

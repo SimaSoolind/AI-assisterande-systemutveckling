@@ -7,7 +7,7 @@ Skriv tester för det jag har byggt. Kör alla tester, så att inget gammalt har
 | 4 – någon annans (403) | `a44ec65` | ja | ägarkollen `getOrder` | rött: status blev `cancelled` |
 | 7 – finns inte (404) | `20550a3` | ja | ägarkollen `getOrder` | rött: 409 i stället för 404 |
 | 5 – inte inloggad (401) | `e442a28` | ja | middlewaren `requireCustomer` | TypeScript stoppade innan testerna startade |
-| 6 – id inte ett tal (400) | (efter commit) | ja | `parseId` | anropet **hängde**: SQL kraschade på `NaN`, och ingen try/catch fångade felet |
+| 6 – id inte ett tal (400) | `4ffe276` | ja | `parseId` | anropet **hängde**: SQL kraschade på `NaN`, och ingen try/catch fångade felet |
 
 **Fynd från fall 6:** risken "ingen gemensam felhanterare" i 02-riskbedomning.md är verklig.
 Ett hängande anrop är värre än 500: klienten får inget svar, och många sådana anrop kan fylla servern (DoS, SAL F5).

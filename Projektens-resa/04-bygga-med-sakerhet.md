@@ -103,10 +103,10 @@ så när jag committade följde steg 3 med. Commiten var redan pushad, så jag s
 35. Varför behövs testet om TypeScript redan stoppar? TypeScript kollar att koden **ser rätt ut**.
     Testet kollar att den **gör rätt**: svaret blir 401 och ingenting ändras.
 
-### Problem 5: mallen kom med i Git
-- Orsak: `git add .` tar med allt, även `docs/rigg-mall.md`.
-- Lösning: `git rm --cached docs/rigg-mall.md` + rad i `.gitignore`. Commit `9a60e1e`.
-- Lärdom: skriv filnamnen i `git add`, inte bara en punkt.
+### Steg 5b: id är inte ett tal → 400 – commit `4ffe276`
+36. Testet skickar `POST /orders/banan/cancel`. Grönt direkt, för `parseId` ger redan 400.
+37. Bevis: utan `parseId` hängde anropet. Se 05-testa.md och den höjda risken i 02-riskbedomning.md.
+38. Valde bort zod här: bara ett id ska valideras, och `parseId` används redan i två andra routes.
 
 ### Problem 3: Testerna fick fel databas
 - Fel: `password authentication failed for user "postgres"`.
@@ -116,6 +116,11 @@ så när jag committade följde steg 3 med. Commiten var redan pushad, så jag s
 ### Problem 4: Pristestet rött igen
 - Orsak: `.venv` var inte aktiverad, så Python hittade inte psycopg.
 - Lösning: `source .venv/bin/activate`. Inte ett fel i koden.
+
+### Problem 5: mallen kom med i Git
+- Orsak: `git add .` tar med allt, även `docs/rigg-mall.md`.
+- Lösning: `git rm --cached docs/rigg-mall.md` + rad i `.gitignore`. Commit `9a60e1e`.
+- Lärdom: skriv filnamnen i `git add`, inte bara en punkt.
 
 ## Säkerhet i det jag byggde (SAL)
 | Fråga | Hur |
