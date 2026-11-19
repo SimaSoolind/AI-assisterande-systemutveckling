@@ -8,6 +8,26 @@ Mallen, sidorna 4–9. Varje svar pekar på en fil eller en commit i repot.
 | **Repo** | github.com/SimaSoolind/AI-assisterande-systemutveckling |
 | **Tagg** | `inlamning` |
 
+## Detaljerna finns i repot
+Den här mallen är en sammanfattning. Den detaljerade beskrivningen av varje steg finns i dokumenten nedan.
+
+| Vad | Dokument |
+|-----|----------|
+| Hela resan steg för steg | [Projektens-resa/](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/tree/main/Projektens-resa) |
+| Riggen, Arbete 1 och Arbete 3 i detalj | [04-bygga-med-sakerhet.md](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/blob/main/Projektens-resa/04-bygga-med-sakerhet.md) |
+| Tester och mutationstest | [05-testa.md](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/blob/main/Projektens-resa/05-testa.md) |
+| Granskning, verifiering och npm audit | [06-validera.md](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/blob/main/Projektens-resa/06-validera.md) |
+| Risker | [02-riskbedomning.md](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/blob/main/Projektens-resa/02-riskbedomning.md) |
+| Alla lärdomar | [08-vad-jag-har-lart-mig.md](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/blob/main/Projektens-resa/08-vad-jag-har-lart-mig.md) |
+| Arbete 1: user story, research, granskning, verifiering | [docs/arbete-1/](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/tree/main/docs/arbete-1) |
+| Arbete 3: analys, codemap, migreringsplan | [docs/](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/tree/main/docs) |
+| Beslut (ADR) | [docs/adr/](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/tree/main/docs/adr) |
+| Sessionsloggar | [sessions/](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/tree/main/sessions) |
+| Riggen: behörigheter, hooks, agenter, skills | [.claude/](https://github.com/SimaSoolind/AI-assisterande-systemutveckling/tree/main/.claude) |
+
+**Bevis:** under varje svar står filen eller commiten där det syns. En commit hittas med
+`git show <commit>` eller på GitHub: `…/commit/<commit>`.
+
 ## Innehåll
 | Del | Om |
 |-----|-----|
